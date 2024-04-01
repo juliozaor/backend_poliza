@@ -1,0 +1,46 @@
+/api/v1/poliza: 
+  get:
+    tags:
+      - Poliza
+    description: Visualizar                  
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Petición exitosa
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                INFORMACIÓN SOBRE POLIZAS VIGENTES RESPONSABILIDAD CIVIL CONTRACTUAL:
+                  type: object
+                  properties:
+                    AMPAROS BÁSICOS:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          nombre:
+                            type: string
+                            example: "Muerte Accidental"
+                          descripcion:
+                            type: string
+                            example: "Coberturas y/o amparos básicos - Valor Asegurado - Limites - Deducible"
+                          tipo_amparo:
+                            type: integer
+                            example: 1
+                          tipo_poliza:
+                            type: integer
+                            example: 1
+                          orden:
+                            type: integer
+                            example: 1
+                          estado:
+                            type: boolean
+                            example: true
+                          tiposAmparo:
+                            $ref: "#/components/schemas/tiposAmparo"
