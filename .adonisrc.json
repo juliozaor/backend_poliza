@@ -27,6 +27,7 @@
     "./start/Rutas/ruta_exportacion",
     "./start/Rutas/ruta_rol",
     "./start/Rutas/ruta_poliza",
+    "./start/Rutas/ruta_maestras",
     "./start/Rutas/ruta_usuario"
   ],
   "providers": [
