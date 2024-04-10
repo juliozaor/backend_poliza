@@ -1,0 +1,16 @@
+/api/v1/maestras/aseguradoras: 
+  get:
+    tags:
+      - Maestras
+    description: Obtener el listado de aseguradoras
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Petición exitosa
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/AseguradoraMaestra"

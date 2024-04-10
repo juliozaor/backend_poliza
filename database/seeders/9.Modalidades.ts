@@ -6,16 +6,13 @@ export default class extends BaseSeeder {
     await TblModalidades.createMany([
       {
         id: 1,
-        nombre: "PC Pasajeros",
-        
+        nombre: "Pasajeros por carretera (PC)",        
       },{
         id: 2,
-        nombre: "ES Especial",
-        
+        nombre: "Transporte especial (ES)",        
       },{
         id: 3,
-        nombre: "MX Mixto",
-        
+        nombre: "Empresa de transporte mixto (MX)",        
       }
     ]);
   }

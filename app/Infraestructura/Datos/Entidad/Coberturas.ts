@@ -1,6 +1,7 @@
-import { BaseModel, BelongsTo, belongsTo, column} from '@ioc:Adonis/Lucid/Orm';
+import { BaseModel, BelongsTo, HasMany, belongsTo, column, hasMany} from '@ioc:Adonis/Lucid/Orm';
 import TblTiposAmparos from './TiposAmparo';
 import TblTiposPolizas from './TiposPoliza';
+import TblDetallesPolizaCoberturas from './DetallespolizaCobertura';
 
 export default class TblCoberturas extends BaseModel {
   @column({ isPrimary: true, columnName: 'cob_id' })  public id: number  
@@ -22,5 +23,12 @@ export default class TblCoberturas extends BaseModel {
     foreignKey: 'tipoPoliza',
   })
   public tipospoliza: BelongsTo<typeof TblTiposPolizas>
+
+  @hasMany (() => TblDetallesPolizaCoberturas, {
+    localKey: 'id',
+    foreignKey: 'coberturaId',
+  })
+  public detalles: HasMany<typeof TblDetallesPolizaCoberturas>
+
 
 }

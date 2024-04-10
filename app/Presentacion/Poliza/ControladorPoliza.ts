@@ -9,8 +9,9 @@ export default class ControladorRol {
     this.service = new ServicioPoliza(new RepositorioPolizaDB())
   }
 
-  public async visualizar () {
-    const polizas = await this.service.visualizar()
+  public async visualizar ({request}:HttpContextContract ){
+    const {modalidadId, poliza, aseguradoraId} = request.all()
+    const polizas = await this.service.visualizar(modalidadId, poliza, aseguradoraId)
     return polizas
   }
 

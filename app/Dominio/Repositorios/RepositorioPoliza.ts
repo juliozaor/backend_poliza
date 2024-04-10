@@ -1,3 +1,3 @@
 export interface RepositorioPoliza {
-  visualizar(): Promise<any>
+  visualizar(modalidadId:number, polizaId:number, aseguradoraId: number): Promise<any>
 }
