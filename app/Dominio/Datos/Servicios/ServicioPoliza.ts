@@ -4,9 +4,14 @@ import { RepositorioPoliza } from 'App/Dominio/Repositorios/RepositorioPoliza'
 export class ServicioPoliza{
   constructor (private repositorio: RepositorioPoliza) { }
 
-  async visualizar (modalidadId:number, polizaId:number, aseguradoraId: number): Promise<any>{
-    return this.repositorio.visualizar(modalidadId, polizaId, aseguradoraId)
+  async visualizar (modalidadId:number, vigiladoId:string): Promise<any>{
+    return this.repositorio.visualizar(modalidadId, vigiladoId)
   }
+
+  async guardar (datos:any, vigiladoId: string): Promise<any>{
+    return this.repositorio.guardar(datos , vigiladoId)
+  }
+
 
 
 }

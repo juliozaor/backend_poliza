@@ -6,6 +6,7 @@ const accion_path = '../../../app/Presentacion/Mx/ControladorMx'
 
 Route.group(() => {
   Route.get('/', accion_path + '.obtenerMxs')
+  Route.get('/vigilado', accion_path + '.obtenerMxVigilado')
   Route.get('/:id', accion_path + '.obtenerMx')
   Route.post('/', accion_path + '.crearMx')
   Route.put('/', accion_path + '.actualizarMxAll') //all

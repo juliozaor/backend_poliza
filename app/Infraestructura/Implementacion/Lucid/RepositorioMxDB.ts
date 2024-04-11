@@ -30,6 +30,16 @@ export class RepositorioMxDB implements RepositorioMx {
     }
   }
 
+  async obtenerMxVigilado(id:string): Promise<{}> {
+    const mx = await TblMxs.findBy('trm_vigilado_id',id);
+    if (mx) {
+      return mx.obtenerMx();
+    }else{
+      return {}
+    }
+
+  }
+
 
   async crearMx(Mx: Mx): Promise<Mx> {
     try{

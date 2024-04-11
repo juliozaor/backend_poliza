@@ -24,6 +24,13 @@ export default class ControladorPc {
       return response.status(200).send(pc);
   }
 
+  public async obtenerPcVigilado ({response, request}:HttpContextContract){
+    const { id } = await request.obtenerPayloadJWT()
+    const pc = await this.service.obtenerPcVigilado(id)
+      return response.status(200).send(pc);
+  }
+
+
   public async crearPc ({response, request}:HttpContextContract){
     try {      
       const pcIn:any  = request.all()

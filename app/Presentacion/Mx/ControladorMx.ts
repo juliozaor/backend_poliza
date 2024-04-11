@@ -24,6 +24,12 @@ export default class ControladorMx {
       return response.status(200).send(mx);
   }
 
+  public async obtenerMxVigilado ({response, request}:HttpContextContract){
+    const { id } = await request.obtenerPayloadJWT()
+    const mx = await this.service.obtenerMxVigilado(id)
+      return response.status(200).send(mx);
+  }
+
   public async crearMx ({response, request}:HttpContextContract){
     try {      
       const mxIn:any  = request.all()

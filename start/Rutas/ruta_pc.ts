@@ -6,6 +6,7 @@ const accion_path = '../../../app/Presentacion/Pc/ControladorPc'
 
 Route.group(() => {
   Route.get('/', accion_path + '.obtenerPcs')
+  Route.get('/vigilado', accion_path + '.obtenerPcVigilado')
   Route.get('/:id', accion_path + '.obtenerPc')
   Route.post('/', accion_path + '.crearPc')
   Route.put('/', accion_path + '.actualizarPcAll') //all

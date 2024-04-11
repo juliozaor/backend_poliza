@@ -5,6 +5,7 @@ import { Paginador } from '../Paginador';
 export interface RepositorioMx {
   obtenerMxs(param: any): Promise<{mxs: Mx[], paginacion: Paginador}>
   obtenerMx(id:number): Promise<Mx>
+  obtenerMxVigilado(id:string): Promise<{}>
   crearMx(mx: Mx): Promise<Mx>
   actualizarMxAll(mx:Mx): Promise<Mx>
   eliminarMx(id:number): Promise<{message: string}>

@@ -11,6 +11,11 @@ export class ServicioEs{
   async obtenerEs(id:number): Promise<Es>{
     return this.repositorio.obtenerEs(id)
   }
+
+  async obtenerEsVigilado(id:string): Promise<Es>{
+    return this.repositorio.obtenerEsVigilado(id)
+  }
+
   async crearEs(es: Es): Promise<Es>{
     return this.repositorio.crearEs(es)
   }

@@ -30,6 +30,16 @@ export class RepositorioPcDB implements RepositorioPc {
     }
   }
 
+  async obtenerPcVigilado(id:string): Promise<{}> {
+      const pc = await TblPcs.findBy('pac_vigilado_id',id);
+      if(pc){
+        return pc.obtenerPc();
+      }else{
+        return {}
+      }
+
+  }
+
 
   async crearPc(pc: Pc): Promise<Pc> {    
    console.log(pc);

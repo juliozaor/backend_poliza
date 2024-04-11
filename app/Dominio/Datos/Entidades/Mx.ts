@@ -19,7 +19,7 @@ export class Mx {
   busEscaleraV: number;
   chivaV: number;
 
-  estado: boolean;
-  vigiladoId: string;
+  estado?: boolean;
+  vigiladoId?: string;
 }
 

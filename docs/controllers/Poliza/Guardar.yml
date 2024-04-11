@@ -1,16 +1,19 @@
-/api/v1/aliados:
+/api/v1/poliza:
   post:
-    tags: Pasajeros por carretera (PC)
-    summary: Crear un registro
+    tags: 
+      - Poliza
+    summary: Guardar poliza
+    parameters:
+      - $ref: "#/components/parameters/AdministrarObligatorio"
     requestBody:
       content:
         multipart/form-data:
           schema:
             type: object
             properties:
-              minimoA:
+              nombre:
                 type: string
-                description: valor minimo grupo A
+                description: nombre del aliado
               logo:
                 type: file
                 description: logotipo

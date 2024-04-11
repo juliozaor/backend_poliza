@@ -16,8 +16,8 @@ export default class TblPcs extends BaseModel {
   @column({ columnName: "pac_grupo_b" }) public grupoB: number;
   @column({ columnName: "pac_grupo_v" }) public grupoC: number;
 
-  @column({ columnName: "pac_estado" }) public estado: boolean;
-  @column({ columnName: "pac_vigilado_id" }) public vigiladoId: string;
+  @column({ columnName: "pac_estado" }) public estado?: boolean;
+  @column({ columnName: "pac_vigilado_id" }) public vigiladoId?: string;
   @column.dateTime({ autoCreate: true, columnName: "pac_creado" })  public createdAt: DateTime;
   @column.dateTime({ autoCreate: true, autoUpdate: true,  columnName: "pac_actualizado", })  public updatedAt: DateTime;
 

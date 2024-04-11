@@ -9,6 +9,6 @@ export class Pc {
   grupoA: number;
   grupoB: number;
   grupoC: number;
-  estado: boolean;
-  vigiladoId: string;
+  estado?: boolean;
+  vigiladoId?: string;
 }

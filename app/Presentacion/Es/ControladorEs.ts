@@ -24,6 +24,12 @@ export default class ControladorEs {
       return response.status(200).send(es);
   }
 
+  public async obtenerEsVigilado ({response, request}:HttpContextContract){
+    const { id } = await request.obtenerPayloadJWT()
+    const es = await this.service.obtenerEsVigilado(id)
+      return response.status(200).send(es);
+  }
+
   public async crearEs ({response, request}:HttpContextContract){
     try {      
       const esIn:any  = request.all()

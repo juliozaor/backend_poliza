@@ -21,8 +21,8 @@ export default class TblEss extends BaseModel {
   @column({ columnName: 'tre_buseta_v' }) public busetaV: number;
   @column({ columnName: 'tre_bus_v' }) public busV: number;
 
-  @column({ columnName: "tre_estado" }) public estado: boolean;
-  @column({ columnName: "tre_vigilado_id" }) public vigiladoId: string;
+  @column({ columnName: "tre_estado" }) public estado?: boolean;
+  @column({ columnName: "tre_vigilado_id" }) public vigiladoId?: string;
   @column.dateTime({ autoCreate: true, columnName: "tre_creado" })  public createdAt: DateTime;
   @column.dateTime({ autoCreate: true, autoUpdate: true,  columnName: "tre_actualizado", })  public updatedAt: DateTime;
 

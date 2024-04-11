@@ -9,9 +9,28 @@ export default class ControladorRol {
     this.service = new ServicioPoliza(new RepositorioPolizaDB())
   }
 
-  public async visualizar ({request}:HttpContextContract ){
-    const {modalidadId, poliza, aseguradoraId} = request.all()
-    const polizas = await this.service.visualizar(modalidadId, poliza, aseguradoraId)
+  public async visualizar ({request,response}:HttpContextContract ){
+    const {modalidadId} = request.all()
+    if(!modalidadId){
+      return response.status(400).json({
+        mensaje: 'modalidadId es requerido'
+      }) 
+     }
+    const { id } = await request.obtenerPayloadJWT()
+    const polizas = await this.service.visualizar(modalidadId, id)
+    return polizas
+  }
+
+  public async guardar ({request, response}:HttpContextContract ){
+    
+    const {modalidadId} = request.all()
+   if(!modalidadId){
+    return response.status(400).json({
+      mensaje: 'modalidadId es requerido'
+    }) 
+   }
+   const { id } = await request.obtenerPayloadJWT()
+    const polizas = await this.service.guardar(request.all(), id)
     return polizas
   }
 

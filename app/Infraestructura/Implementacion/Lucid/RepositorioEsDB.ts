@@ -30,6 +30,16 @@ export class RepositorioEsDB implements RepositorioEs {
     }
   }
 
+  async obtenerEsVigilado(id:string): Promise<{}> {
+      const es = await TblEss.findBy('tre_vigilado_id',id);
+      if (es) {
+        return es.obtenerEs();
+      }else{
+        return {}
+      }
+  }
+
+
 
   async crearEs(Es: Es): Promise<Es> {
     try{

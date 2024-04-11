@@ -14,6 +14,6 @@ export class Es {
   microbusV: number;
   busetaV: number;
   busV: number;
-  estado: boolean;
-  vigiladoId: string;
+  estado?: boolean;
+  vigiladoId?: string;
 }
