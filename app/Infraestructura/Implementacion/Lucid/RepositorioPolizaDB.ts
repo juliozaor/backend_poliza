@@ -15,22 +15,46 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
   async visualizar(modalidadId: number, vigiladoId: string): Promise<any> {
     let editable = true;
 
-    const poliza = await TblPolizas.query()
+const polizaIds = new Array()     
+
+    const polizaContractual = await TblPolizas.query().preload('responsabilidad')
       .where("pol_modalidad_id", modalidadId)
       .where("pol_vigilado_id", vigiladoId)
-      .orderBy("pol_fin_vigencia", "desc")
-      .first();
+      .where("pol_tipo_poliza_id", 1)
+      .where("pol_fin_vigencia", ">=", new Date())
+      .orderBy("pol_fin_vigencia", "desc")  
+      .first()
+
+      
+      
+
+      if(polizaContractual){
+        polizaIds.push(polizaContractual.id)
+      }
+
+      const polizaExtra = await TblPolizas.query().preload('responsabilidad')
+      .where("pol_modalidad_id", modalidadId)
+      .where("pol_vigilado_id", vigiladoId)
+      .where("pol_tipo_poliza_id", 2)
+      .where("pol_fin_vigencia", ">=", new Date())
+      .orderBy("pol_fin_vigencia", "desc")  
+      .first()
+
+      if(polizaExtra){
+        polizaIds.push(polizaExtra.id)
+      }
+
 
     const consulta = TblTiposPolizas.query().preload(
       "coberturas",
       async (sqlCob) => {
         sqlCob.preload("tiposAmparo");
         sqlCob.orderBy("orden", "asc");
-        if (poliza) {
+        if (polizaIds.length > 0) {
           sqlCob.preload("detalles", (sqlDetalle) => {
-            sqlDetalle.where("dpl_poliza_id", poliza.id!);
+            sqlDetalle.whereIn("dpl_poliza_id", polizaIds);
           });
-          editable = false;
+          editable = false;          
         }
       }
     );
@@ -62,6 +86,16 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
       {}
     );
 
+    
+    if(polizaContractual){
+      coberturasPorTipoAmparoYPoliza["polizaContractual"] = polizaContractual;
+    }
+    
+    if(polizaExtra){
+      coberturasPorTipoAmparoYPoliza["polizaExtracontractual"] = polizaExtra;
+    }
+    
+    
     coberturasPorTipoAmparoYPoliza["editable"] = editable;
     return coberturasPorTipoAmparoYPoliza;
   }
@@ -78,8 +112,8 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
     
     try {
       await this.guardarModalidades(modalidadId, vigiladoId, pc, es, mx);
-      await this.guardarPoliza(modalidadId, polizaContractual, vigiladoId);
-      await this.guardarPoliza(modalidadId, polizaExtracontractual, vigiladoId);
+      await this.guardarPoliza(modalidadId, polizaContractual, vigiladoId,1);
+      await this.guardarPoliza(modalidadId, polizaExtracontractual, vigiladoId,2);
       return {
         mensaje: "Polizas guardada correctamente",
       };
@@ -92,7 +126,8 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
   guardarPoliza = async (
     modalidadId: number,
     poliza: any,
-    vigiladoId: string
+    vigiladoId: string,
+    tipoPoliza:number
   ) => {
 
     let polizaId
@@ -108,6 +143,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
       polizaDB.establecerPolizaDb(poliza);
       polizaDB.modalidadId = modalidadId;
       polizaDB.vigiladoId = vigiladoId;
+      polizaDB.tipoPolizaId = tipoPoliza;
       await polizaDB.save();
       polizaId = polizaDB.id;
     }
