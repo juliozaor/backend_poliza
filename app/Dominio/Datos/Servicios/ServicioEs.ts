@@ -12,7 +12,7 @@ export class ServicioEs{
     return this.repositorio.obtenerEs(id)
   }
 
-  async obtenerEsVigilado(id:string): Promise<Es>{
+  async obtenerEsVigilado(id:string): Promise<{}>{
     return this.repositorio.obtenerEsVigilado(id)
   }
 

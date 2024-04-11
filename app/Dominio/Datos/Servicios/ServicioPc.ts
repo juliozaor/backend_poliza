@@ -11,7 +11,7 @@ export class ServicioPc{
   async obtenerPc(id:number): Promise<Pc>{
     return this.repositorio.obtenerPc(id)
   }
-  async obtenerPcVigilado(id:string): Promise<Pc>{
+  async obtenerPcVigilado(id:string): Promise<{}>{
     return this.repositorio.obtenerPcVigilado(id)
   }
   async crearPc(pc: Pc): Promise<Pc>{

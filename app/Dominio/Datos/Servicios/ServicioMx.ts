@@ -11,7 +11,7 @@ export class ServicioMx{
   async obtenerMx(id:number): Promise<Mx>{
     return this.repositorio.obtenerMx(id)
   }
-  async obtenerMxVigilado(id:string): Promise<Mx>{
+  async obtenerMxVigilado(id:string): Promise<{}>{
     return this.repositorio.obtenerMxVigilado(id)
   }
   async crearMx(mx: Mx): Promise<Mx>{
