@@ -1,6 +1,6 @@
 
 import { RepositorioPoliza } from "App/Dominio/Repositorios/RepositorioPoliza";
-import TblTiposPolizas from "App/Infraestructura/Datos/Entidad/TiposPoliza";
+/* import TblTiposPolizas from "App/Infraestructura/Datos/Entidad/TiposPoliza"; */
 import TblPolizas from "App/Infraestructura/Datos/Entidad/poliza";
 import TblDetallesPolizaCoberturas from "App/Infraestructura/Datos/Entidad/DetallespolizaCobertura";
 import { Responsabilidad } from "App/Dominio/Datos/Entidades/responsabilidad";

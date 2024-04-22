@@ -6,7 +6,6 @@ import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser';
 import { Resultado } from 'App/Dominio/Resultado';
 import { ErrorFormatoImportarExcel } from './Dtos/ErrorFormatoImportarExcel';
 import { RespuestaImportacionExcel } from './Dtos/RespuestaImportacionExcel';
-import TblMarcas from 'App/Infraestructura/Datos/Entidad/Marcas';
 
 export class ServicioImportarVehiculos {
   async importDataXLSX(
@@ -72,7 +71,7 @@ export class ServicioImportarVehiculos {
       exitoso: false
     }) */
   }
-v
+
   async import(
     colComment: Excel.Column,
     hoja: Excel.Worksheet): Promise<Resultado<RespuestaImportacionExcel>> {
@@ -87,7 +86,7 @@ v
       })
     }
 
-    await TblVehiculosPatios.query().where({ 'veh_vigilado': idVigilado, 'veh_vigencia': vigencia, 'veh_mes': mes }).delete();
+   /*  await TblVehiculosPatios.query().where({ 'veh_vigilado': idVigilado, 'veh_vigencia': vigencia, 'veh_mes': mes }).delete();
 
     colComment.eachCell(async (cell, rowNumber) => {
       if (rowNumber >= 2) {
@@ -113,7 +112,7 @@ v
           }
         }
       }
-    })
+    }) */
     return new Resultado({
       exitoso: true,
       estado: 200
@@ -121,8 +120,8 @@ v
   }
 
   async validarVehiculos(hoja: Excel.Worksheet): Promise<ErrorFormatoImportarExcel[]> {
-    const marcas = await TblMarcas.all()
-    const nombresMarcas = marcas.map(marca => marca.nombre)
+   /*  const marcas = await TblMarcas.all()
+    const nombresMarcas = marcas.map(marca => marca.nombre) */
     let errores: ErrorFormatoImportarExcel[] = []
     hoja.eachRow(fila => {
       if (fila.number > 1) {
@@ -153,7 +152,7 @@ v
           }
         }
 
-        if (!marca) {
+        /* if (!marca) {
           errores.push({
             columna: 'B',
             fila: fila.number.toString(),
@@ -173,7 +172,7 @@ v
             }
           
           }
-        }
+        } */
 
       }
     })
