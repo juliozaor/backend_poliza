@@ -8,8 +8,6 @@ export default class extends BaseSchema {
       table.increments('cob_id')
       table.string('cob_nombre',200)
       table.text('cob_descripcion')
-      table.integer('cob_tipo_amparo_id').references('tam_id').inTable('tbl_tipos_amparos')
-      table.integer('cob_tipo_poliza_id').references('tpo_id').inTable('tbl_tipos_polizas')
       table.integer('cob_orden', 3)
       table.boolean('cob_estado').defaultTo(true)
     })

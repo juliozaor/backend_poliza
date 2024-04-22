@@ -6,7 +6,7 @@ import { Responsabilidad } from 'App/Dominio/Datos/Entidades/responsabilidad';
 export default class TblResponsabilidades extends BaseModel {
   @column({ isPrimary: true, columnName: 'res_id' })  public id?: number 
 
-  @column({ columnName: 'res_poliza_id' }) public polizaId?: number
+  @column({ columnName: 'res_poliza' }) public poliza?: number
   @column({ columnName: 'res_fecha_constitucion' }) public fechaConstitucion: string
   @column({ columnName: 'res_resolucion' }) public resolucion: number
   @column({ columnName: 'res_fecha_resolucion' }) public fechaResolucion: string
@@ -21,7 +21,7 @@ export default class TblResponsabilidades extends BaseModel {
 
   public establecerResponsabilidadDb (responsabilidad: Responsabilidad) {
     this.id = responsabilidad.id
-    this.polizaId = responsabilidad.polizaId
+    this.poliza = responsabilidad.poliza
     this.fechaConstitucion = responsabilidad.fechaConstitucion
     this.resolucion = responsabilidad.resolucion
     this.fechaResolucion = responsabilidad.fechaResolucion
@@ -34,7 +34,7 @@ export default class TblResponsabilidades extends BaseModel {
   }
 
   public estableceResponsabilidadConId (responsabilidad: Responsabilidad) {
-    this.polizaId = responsabilidad.polizaId
+    this.poliza = responsabilidad.poliza
     this.fechaConstitucion = responsabilidad.fechaConstitucion
     this.resolucion = responsabilidad.resolucion
     this.fechaResolucion = responsabilidad.fechaResolucion
@@ -49,7 +49,7 @@ export default class TblResponsabilidades extends BaseModel {
   public obtenerResponsabilidad (): Responsabilidad {
     const responsabilidad = new Responsabilidad()
     responsabilidad.id = this.id
-    responsabilidad.polizaId = this.polizaId
+    responsabilidad.poliza = this.poliza
     responsabilidad.fechaConstitucion = this.fechaConstitucion
     responsabilidad.resolucion = this.resolucion
     responsabilidad.fechaResolucion = this.fechaResolucion
@@ -63,10 +63,10 @@ export default class TblResponsabilidades extends BaseModel {
   }
 
   @belongsTo(() => TblPolizas, {
-    localKey: 'id',
-    foreignKey: 'polizaId',
+    localKey: 'numero',
+    foreignKey: 'poliza',
   })
-  public poliza: BelongsTo<typeof TblPolizas>
+  public polizas: BelongsTo<typeof TblPolizas>
 
 
 }

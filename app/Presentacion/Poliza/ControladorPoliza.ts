@@ -23,12 +23,6 @@ export default class ControladorRol {
 
   public async guardar ({request, response}:HttpContextContract ){
     
-    const {modalidadId} = request.all()
-   if(!modalidadId){
-    return response.status(400).json({
-      mensaje: 'modalidadId es requerido'
-    }) 
-   }
    const { id } = await request.obtenerPayloadJWT()
     const polizas = await this.service.guardar(request.all(), id)
     return polizas

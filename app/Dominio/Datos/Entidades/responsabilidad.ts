@@ -1,6 +1,6 @@
 export class Responsabilidad {
   id?: number  
-  polizaId?: number
+  poliza?: number
   fechaConstitucion: string
   resolucion: number
   fechaResolucion: string
