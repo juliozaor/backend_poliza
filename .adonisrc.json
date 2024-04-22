@@ -28,6 +28,7 @@
     "./start/Rutas/ruta_rol",
     "./start/Rutas/ruta_poliza",
     "./start/Rutas/ruta_maestras",
+    "./start/Rutas/ruta_vehiculo",
     "./start/Rutas/ruta_es",
     "./start/Rutas/ruta_pc",
     "./start/Rutas/ruta_mx",
