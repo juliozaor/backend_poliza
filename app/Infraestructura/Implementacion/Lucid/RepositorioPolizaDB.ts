@@ -5,6 +5,9 @@ import TblPolizas from "App/Infraestructura/Datos/Entidad/poliza";
 import TblDetallesPolizaCoberturas from "App/Infraestructura/Datos/Entidad/DetallespolizaCobertura";
 import { Responsabilidad } from "App/Dominio/Datos/Entidades/responsabilidad";
 import TblResponsabilidades from "App/Infraestructura/Datos/Entidad/responsabilidades";
+import { Archivo } from "App/Dominio/Datos/Entidades/archivo";
+import TblArchivo from "App/Infraestructura/Datos/Entidad/Archivos";
+import TblCapacidades from "App/Infraestructura/Datos/Entidad/Capacidades";
 
 export class RepositorioPolizaDB implements RepositorioPoliza {
   async visualizar(modalidadId: number, vigiladoId: string): Promise<any> {
@@ -98,8 +101,9 @@ const polizaIds = new Array()
   async guardar(datos: any, vigiladoId: string): Promise<any> {
     const {
       polizaContractual,
-      polizaExtracontractual,
+      polizaExtracontractual,      
     } = datos;
+
     
     try {
       await this.guardarPoliza(polizaContractual, vigiladoId,1);
@@ -144,6 +148,10 @@ const polizaIds = new Array()
       await this.guardarResponsabilidad(poliza.responsabilidad, poliza.numero);
     }
 
+    if(poliza.caratula){
+      await this.guardarArchivo(poliza.caratula, poliza.numero);
+    }
+
 
     try {
       await TblDetallesPolizaCoberturas.updateOrCreateMany(['coberturaId','poliza'],amparosIn);
@@ -167,7 +175,7 @@ const polizaIds = new Array()
   ) => {
     try {
       const respondabilidadBDExiste = await TblResponsabilidades.findBy(
-        "res_poliza_id",
+        "res_poliza",
         poliza
       );
       if (respondabilidadBDExiste) {
@@ -185,5 +193,48 @@ const polizaIds = new Array()
       console.log(error);
     }
   };
+
+  guardarArchivo = async (
+    archivo: Archivo,
+    poliza: number
+  ) => {
+    try {
+      const archivoBDExiste = await TblArchivo.findBy(
+        "arc_poliza",
+        poliza
+      );
+      if (archivoBDExiste) {
+        archivoBDExiste.estableceArchivoConId(archivo);
+        await archivoBDExiste.save();
+        return archivoBDExiste;
+      } else {
+        const archivoBD = new TblArchivo();
+        archivoBD.establecerArchivoDb(archivo);
+        archivoBD.poliza = poliza;
+        await archivoBD.save();
+        return archivoBD;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  async capacidad(datos: any, vigiladoId: string): Promise<any> {  
+    const { capacidades }= datos 
+    capacidades.map(capacidad =>{
+      capacidad.vigiladoId = vigiladoId
+      return capacidad
+    })    
+    
+    try {
+      await TblCapacidades.updateOrCreateMany(['modalidadId','numero'],capacidades);
+      return {
+        mensaje: "Modalidades guardadas correctamente",
+      };
+    } catch (error) {
+      console.log(error);
+      
+    }
+  }
 
 }

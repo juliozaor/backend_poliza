@@ -28,4 +28,12 @@ export default class ControladorRol {
     return polizas
   }
 
+  
+  public async capacidad ({request, response}:HttpContextContract ){
+    
+    const { id } = await request.obtenerPayloadJWT()
+     const polizas = await this.service.capacidad(request.all(), id)
+     return polizas
+   }
+
 }

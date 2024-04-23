@@ -52,10 +52,10 @@ export default class Controladorvehiculo {
       const respuesta = await this.servicioImportacionVehiculos.importDataXLSX(
         archivo, poliza
       );
-      console.log("En el controlador", respuesta);
+      
       return response
         .status(respuesta.estado)
-        .send(respuesta.datos ?? respuesta.mensaje);
+        .send(respuesta.datos ?? {mensaje: respuesta.mensaje});
     } catch (error) {
       return response
         .status(400)

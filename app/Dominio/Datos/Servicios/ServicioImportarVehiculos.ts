@@ -91,7 +91,7 @@ export class ServicioImportarVehiculos {
     
     colComment.eachCell(async (cell, rowNumber) => {
       if (rowNumber >= 2) {
-        const placa = hoja.getCell('A' + rowNumber).value!.toString()
+        const placa = hoja.getCell('A' + rowNumber).value!.toString().toUpperCase();
         const pasajeros = parseInt(hoja.getCell('B' + rowNumber).value!.toString())
         if (placa !== '') {
           //custom field name in database to variable

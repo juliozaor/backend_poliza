@@ -1,25 +1,45 @@
-/* import { DateTime } from 'luxon';
+import { DateTime } from 'luxon';
 import { BaseModel, BelongsTo, belongsTo, column} from '@ioc:Adonis/Lucid/Orm';
 import TblPolizas from './poliza';
+import { Archivo } from 'App/Dominio/Datos/Entidades/archivo';
 
-export default class TblVehiculos extends BaseModel {
-  @column({ isPrimary: true, columnName: 'arc_id' })  public id: number  
-  @column({ columnName: 'arc_poliza_id' }) public polzaId: number
-  
+export default class TblArchivo extends BaseModel {
+  @column({ isPrimary: true, columnName: 'arc_id' })  public id?: number  
+  @column({ columnName: 'arc_poliza' }) public poliza?: number  
   @column({ columnName: 'arc_nombre' }) public nombre: string
-  @column({ columnName: 'arc_nombre_original' }) public nombreOriginal: number
+  @column({ columnName: 'arc_nombre_original' }) public nombreOriginal: string
   @column({ columnName: 'arc_ruta' }) public ruta: string
-  @column({ columnName: 'arc_valor_cumplimiento_uno' }) public valorCumplimienteUno: number
-  @column({ columnName: 'arc_valor_cumplimiento_dos' }) public valorCumplimienteDos: number
+  
+  public establecerArchivoDb (archivo: Archivo) {
+    this.id = archivo.id
+    this.poliza = archivo.poliza
+    this.nombre = archivo.nombre
+    this.nombreOriginal = archivo.nombreOriginal
+    this.ruta = archivo.ruta
+  }
 
-  @column.dateTime({ autoCreate: true , columnName: 'arc_creado'}) public createdAt: DateTime
-  @column.dateTime({ autoCreate: true, autoUpdate: true, columnName: 'arc_actualizado' }) public updatedAt: DateTime 
+  public estableceArchivoConId (archivo: Archivo) {
+    this.poliza = archivo.poliza
+    this.nombre = archivo.nombre
+    this.nombreOriginal = archivo.nombreOriginal
+    this.ruta = archivo.ruta
+  }
+
+  public obtenerArchivo (): Archivo {
+    const archivo = new Archivo()
+    archivo.id = this.id
+    archivo.poliza = this.poliza
+    archivo.nombre = this.nombre
+    archivo.nombreOriginal = this.nombreOriginal
+    archivo.ruta = this.ruta
+    return archivo
+  }
 
   @belongsTo(() => TblPolizas, {
-    localKey: 'id',
-    foreignKey: 'polizaId',
+    localKey: 'numero',
+    foreignKey: 'poliza',
   })
-  public poliza: BelongsTo<typeof TblPolizas>
+  public polizas: BelongsTo<typeof TblPolizas>
 
 
-} */
+}
