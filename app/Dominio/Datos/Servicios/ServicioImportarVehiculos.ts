@@ -6,10 +6,13 @@ import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser';
 import { Resultado } from 'App/Dominio/Resultado';
 import { ErrorFormatoImportarExcel } from './Dtos/ErrorFormatoImportarExcel';
 import { RespuestaImportacionExcel } from './Dtos/RespuestaImportacionExcel';
+import TblVehiculos from 'App/Infraestructura/Datos/Entidad/Vehiculos';
+import { Vehiculo } from '../Entidades/Vehiculo';
 
 export class ServicioImportarVehiculos {
   async importDataXLSX(
-    archivo: MultipartFileContract
+    archivo: MultipartFileContract,
+    poliza: number
   ): Promise<Resultado<RespuestaImportacionExcel>> {
     let rutaArchivo;
     try {
@@ -34,7 +37,7 @@ export class ServicioImportarVehiculos {
       const filePath = path.resolve(`${dir}${fname}`);
       rutaArchivo = filePath;
       // Resto de la lógica del servicio...
-      let resultado = await this.importVehiculos(filePath)
+      let resultado = await this.importVehiculos(filePath, poliza)
       return resultado
     } catch (error) {
       console.error(error);
@@ -56,15 +59,14 @@ export class ServicioImportarVehiculos {
     }
   }
 
-  async importVehiculos(filelocation): Promise<Resultado<RespuestaImportacionExcel>> {
+  async importVehiculos(filelocation, poliza: number): Promise<Resultado<RespuestaImportacionExcel>> {
     let resultado: Resultado<ErrorFormatoImportarExcel[]>
     let libro = new Excel.Workbook()
     libro = await libro.xlsx.readFile(filelocation)
     let hoja = libro.getWorksheet('Hoja1')! // get sheet name
     let colComment = hoja.getColumn('A') //column name
-    console.log(colComment);
     
-      return this.import(colComment, hoja);
+      return this.import(colComment, hoja, poliza);
     
     /* return new Resultado({
       estado: 500,
@@ -72,10 +74,9 @@ export class ServicioImportarVehiculos {
     }) */
   }
 
-  async import(
-    colComment: Excel.Column,
-    hoja: Excel.Worksheet): Promise<Resultado<RespuestaImportacionExcel>> {
-    const errores = await this.validarVehiculos(hoja)
+  async import(colComment: Excel.Column,hoja: Excel.Worksheet, poliza:number): Promise<Resultado<RespuestaImportacionExcel>> {
+    
+    const errores = await this.validarVehiculos(hoja, poliza)
     if (errores.length > 0) {
       const archivoB64 = await this.generarCsvErrores(errores)
       return new Resultado({
@@ -86,51 +87,44 @@ export class ServicioImportarVehiculos {
       })
     }
 
-   /*  await TblVehiculosPatios.query().where({ 'veh_vigilado': idVigilado, 'veh_vigencia': vigencia, 'veh_mes': mes }).delete();
-
+    await TblVehiculos.query().where('veh_poliza',poliza).delete();
+    
     colComment.eachCell(async (cell, rowNumber) => {
       if (rowNumber >= 2) {
-        const patio = hoja.getCell('A' + rowNumber).value!.toString()
-        const placa = hoja.getCell('B' + rowNumber).value!.toString()
-        const ingreso = hoja.getCell('C' + rowNumber).value
-        if (placa !== '' && patio !== '' && ingreso !== '') {
+        const placa = hoja.getCell('A' + rowNumber).value!.toString()
+        const pasajeros = parseInt(hoja.getCell('B' + rowNumber).value!.toString())
+        if (placa !== '') {
           //custom field name in database to variable
-          const inputPlaca: VehiculoPatio = {
-            patioId: patio,
-            placa: placa.toString().toLocaleLowerCase(),
-            ingreso: new Date(ingreso!.toString()),
-            vigilado: idVigilado,
-            vigencia, mes
+          const inputPlaca: Vehiculo = {
+            placa,
+            pasajeros,
+            poliza
           }
           try {
-            const vehiculo = new TblVehiculosPatios()
-            vehiculo.estableceVehiculoConId(inputPlaca)
-            await vehiculo.save()
-            console.log(vehiculo.id);
+            await TblVehiculos.updateOrCreate({ placa: inputPlaca.placa }, inputPlaca)
           } catch (error) {
-            console.log('la placa ya existe');
+            console.log(error);
+            
           }
         }
       }
-    }) */
+    })
     return new Resultado({
       exitoso: true,
-      estado: 200
+      estado: 200,
+      mensaje:'Archivo cargado correctamente'
     })
+
   }
 
-  async validarVehiculos(hoja: Excel.Worksheet): Promise<ErrorFormatoImportarExcel[]> {
+  async validarVehiculos(hoja: Excel.Worksheet, poliza: number): Promise<ErrorFormatoImportarExcel[]> {
    /*  const marcas = await TblMarcas.all()
     const nombresMarcas = marcas.map(marca => marca.nombre) */
     let errores: ErrorFormatoImportarExcel[] = []
     hoja.eachRow(fila => {
       if (fila.number > 1) {
         const placa = fila.getCell('A').value?.valueOf()
-        const marca = fila.getCell('B').value?.valueOf()
-        const modelo = fila.getCell('C').value?.valueOf()
-        const tipo = fila.getCell('D').value?.valueOf()
-        const clase = fila.getCell('E').value?.valueOf()
-        const cantidad = fila.getCell('F').value?.valueOf()
+        const pasajeros = fila.getCell('B').value?.valueOf()
         //Validar existencia
         if (!placa) {
           errores.push({
@@ -152,7 +146,7 @@ export class ServicioImportarVehiculos {
           }
         }
 
-        /* if (!marca) {
+        if (!pasajeros) {
           errores.push({
             columna: 'B',
             fila: fila.number.toString(),
@@ -160,19 +154,18 @@ export class ServicioImportarVehiculos {
             valor: null
           })
         } else {
-          if ( typeof marca === 'string') {            
-            const existeMarca = nombresMarcas.includes(marca)
-            if (!existeMarca) {
+          if ( typeof pasajeros === 'number') {            
+            if(pasajeros.toString().length > 2){
               errores.push({
                 columna: 'B',
                 fila: fila.number.toString(),
-                error: `No existe la marca: ${marca}`,
-                valor: marca
+                error: `La cantidad de pasajeros no pude tener mas de 2 caracteres`,
+                valor: pasajeros
               })
             }
           
           }
-        } */
+        }
 
       }
     })

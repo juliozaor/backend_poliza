@@ -1,4 +1,4 @@
-import { DateTime } from 'luxon';
+/* import { DateTime } from 'luxon';
 import { BaseModel, BelongsTo, belongsTo, column} from '@ioc:Adonis/Lucid/Orm';
 import TblPolizas from './poliza';
 
@@ -22,4 +22,4 @@ export default class TblVehiculos extends BaseModel {
   public poliza: BelongsTo<typeof TblPolizas>
 
 
-}
+} */

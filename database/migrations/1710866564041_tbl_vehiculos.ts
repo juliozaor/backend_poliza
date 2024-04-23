@@ -8,7 +8,7 @@ export default class extends BaseSchema {
       table.increments('veh_id')
       table.string('veh_placa', 6)
       table.integer('veh_pasajeros', 2)
-      table.bigInteger('veh_poliza').references('pol_numero').inTable('tbl_polizas')
+      table.bigInteger('veh_poliza')
       table.timestamp('veh_creado', { useTz: true })
       table.timestamp('veh_actualizado', { useTz: true })
     })
