@@ -13,12 +13,18 @@ export default class ControladorReporte {
     const rutaRaiz = 'polizas';
     const ruta = 'archivos';
     const endpoint = `/api/v1/${ruta}`
-    const archivo = request.file('archivo');
+    const archivo = request.file('archivo', {
+      extnames: ['pdf'],
+    })
     const { documento } = await request.obtenerPayloadJWT()
     if (!archivo) {
       return response.status(400).send({
         mensaje: 'No se encontro el archivo'
       })
+    }
+
+    if (!archivo.isValid) {
+      return response.status(415).send({ mensaje: `Formato inválido: no se puede cargar el archivo seleccionado. Inténtalo nuevamente, el tipo de archivo permitido es '.pdf'` })
     }
 
     const fs = require('fs');

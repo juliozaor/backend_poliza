@@ -39,7 +39,7 @@ export default class Controladorvehiculo {
       return response
         .status(415)
         .send({
-          mensaje: `Formato inválido: no se puede cargar el archivo seleccionado. Inténtalo nuevamnte`,
+          mensaje: `Formato inválido: no se puede cargar el archivo seleccionado. Inténtalo nuevamente, los tipos de archivo permitido son '.xlsx', '.xls'`,
         });
     }
     
