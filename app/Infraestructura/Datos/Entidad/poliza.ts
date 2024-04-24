@@ -1,8 +1,11 @@
 import { DateTime } from 'luxon';
-import { BaseModel, BelongsTo, HasOne, belongsTo, column, hasOne} from '@ioc:Adonis/Lucid/Orm';
+import { BaseModel, BelongsTo, HasMany, HasOne, belongsTo, column, hasMany, hasOne} from '@ioc:Adonis/Lucid/Orm';
 import TblAseguradoras from './Aseguradoras';
 import { Poliza } from 'App/Dominio/Datos/Entidades/Poliza';
 import TblResponsabilidades from './responsabilidades';
+import TblVehiculos from './Vehiculos';
+import TblTiposPolizas from './TiposPoliza';
+import TblUsuarios from './Usuario';
 
 export default class TblPolizas extends BaseModel {
   @column({ isPrimary: true, columnName: 'pol_id' })  public id?: number  
@@ -60,10 +63,28 @@ export default class TblPolizas extends BaseModel {
   public aseguradoras: BelongsTo<typeof TblAseguradoras>
 
   @hasOne(() => TblResponsabilidades, {
-    localKey: 'id',
+    localKey: 'numero',
     foreignKey: 'polizaId',
   })
   public responsabilidad: HasOne<typeof TblResponsabilidades>
+
+  @hasMany(()=>TblVehiculos, {
+    localKey: 'numero',
+    foreignKey: 'poliza'
+  })
+  public vehiculos: HasMany<typeof TblVehiculos>
+
+  @belongsTo(() => TblTiposPolizas, {
+    localKey: 'id',
+    foreignKey: 'tipoPolizaId',
+  })
+  public tipoPoliza: BelongsTo<typeof TblTiposPolizas>
+
+  @belongsTo(() => TblUsuarios, {
+    localKey: 'id',
+    foreignKey: 'vigiladoId',
+  })
+  public vigilado: BelongsTo<typeof TblUsuarios>
 
 
 }

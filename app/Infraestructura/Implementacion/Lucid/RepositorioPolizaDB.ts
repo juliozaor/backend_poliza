@@ -8,6 +8,8 @@ import TblResponsabilidades from "App/Infraestructura/Datos/Entidad/responsabili
 import { Archivo } from "App/Dominio/Datos/Entidades/archivo";
 import TblArchivo from "App/Infraestructura/Datos/Entidad/Archivos";
 import TblCapacidades from "App/Infraestructura/Datos/Entidad/Capacidades";
+import Database from "@ioc:Adonis/Lucid/Database";
+import { MapeadorPaginacionDB } from "./MapeadorPaginacionDB";
 
 export class RepositorioPolizaDB implements RepositorioPoliza {
   async visualizar(modalidadId: number, vigiladoId: string): Promise<any> {
@@ -231,6 +233,83 @@ const polizaIds = new Array()
       return {
         mensaje: "Modalidades guardadas correctamente",
       };
+    } catch (error) {
+      console.log(error);
+      
+    }
+  }
+
+  async obtenerVehiculos(params: any): Promise<any> {  
+    const {pagina, limite} = params
+    /* try {
+      const { vigiladoId } = params
+      const sql = TblPolizas.query().preload('tipoPoliza').preload('vehiculos').preload('vigilado')
+   //   const sql = TblPolizas.query().where('vigiladoId',vigiladoId).preload('tipoPoliza').preload('vehiculos')
+   if (vigiladoId) {
+    sql.where('vigiladoId',vigiladoId)
+   }
+
+   const placas = new Array()
+   const polizas = await sql
+
+
+
+   polizas.map(poliza =>{
+    poliza.vehiculos.map(vehiculo =>{
+      placas.push(
+        { 
+          nit: poliza.vigilado.identificacion,
+          razonSocial: poliza.vigilado.nombre,
+          tipo: poliza.tipoPoliza.descripcion,
+          numeroPoliza: poliza.numero,
+          placa : vehiculo.placa,
+          cantidadPasajeros: vehiculo.pasajeros
+        }
+      )
+    })
+   })
+
+
+      return placas */
+      const placas= new Array();
+
+      const datos = await Database.from("tbl_vehiculos as tv")
+    .select(
+      "tu.usn_identificacion as nit",
+      "tu.usn_nombre as razon_social",
+      "ttp.tpo_descripcion as tipo",
+      "tp.pol_numero as numero_poliza",
+      "tv.veh_placa as placa",
+      "tv.veh_pasajeros as pasajeros"
+    )
+    .leftJoin("tbl_polizas as tp", "tp.pol_numero", "tv.veh_poliza")
+    .leftJoin("tbl_tipos_polizas as ttp", "tp.pol_tipo_poliza_id", "ttp.tpo_id")
+    .leftJoin("tbl_usuarios as tu", "tp.pol_vigilado_id", "tu.usn_id")
+    .paginate(pagina, limite);
+
+    datos.forEach((dato) => {
+      placas.push({
+        nit: dato.nit,
+        razon_social: dato.razon_social,
+        tipo: dato.tipo,
+        numero_poliza: dato.numero_poliza,
+        placa: dato.placa,
+        pasajeros: dato.pasajeros
+      });
+    });
+
+    const datosSerializados = {
+      ...datos,
+      serialize() {
+        return datos.toJSON();
+      }
+    };
+    
+    const paginacion = MapeadorPaginacionDB.obtenerPaginacion(datosSerializados);
+
+    return { placas, paginacion };
+
+
     } catch (error) {
       console.log(error);
       

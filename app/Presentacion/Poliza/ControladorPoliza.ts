@@ -36,4 +36,11 @@ export default class ControladorRol {
      return polizas
    }
 
+   public async obtenerVehiculos ({request, response}:HttpContextContract ){
+    
+    
+     const vehiculos = await this.service.obtenerVehiculos(request.all())
+     return vehiculos
+   }
+
 }

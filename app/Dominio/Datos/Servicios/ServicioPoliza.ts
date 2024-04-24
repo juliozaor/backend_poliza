@@ -9,13 +9,15 @@ export class ServicioPoliza{
   }
 
   async guardar (datos:any, vigiladoId: string): Promise<any>{
-    return this.repositorio.guardar(datos , vigiladoId)
+    return this.repositorio.guardar(datos, vigiladoId)
   }
 
   async capacidad (datos:any, vigiladoId: string): Promise<any>{
-    return this.repositorio.capacidad(datos , vigiladoId)
+    return this.repositorio.capacidad(datos, vigiladoId)
   }
 
-
+  async obtenerVehiculos (params: any): Promise<any>{
+    return this.repositorio.obtenerVehiculos(params)
+  }
 
 }
