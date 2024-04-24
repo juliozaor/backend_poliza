@@ -2,6 +2,8 @@
   post:
     tags:
       - Usuario
+    security:
+      - bearerAuth: []
     description: Registrar un usuario
     requestBody:
       required: true

@@ -2,6 +2,8 @@
   get:
     tags:
       - Usuario
+    security:
+      - bearerAuth: []
     description: Consultar un usuario
     parameters:
       - name: documento

@@ -15,6 +15,15 @@ export default {
 				title: 'Documentación APIs SISI-POLIZAS',
 				version: '1.0.0',
 				description: 'Documentación de las APIs del aplicativo SISI-POLIZAS'
+			},
+			components: {
+				securitySchemes: {
+				bearerAuth: {
+					type: "http",
+					scheme: "Bearer",
+					bearerFormat: "JWT"
+				}
+				}
 			}
 		},
 

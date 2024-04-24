@@ -35,11 +35,11 @@ export class RepositorioAseguradoraDB implements RepositorioAseguradora {
     try {
       
       let aseguradoraDB = new TblAseguradoras();
-      aseguradoraDB.establecerAseguradoraDb(aseguradora);
+      aseguradoraDB.estableceAseguradoraConId(aseguradora);
       await aseguradoraDB.save();
       return aseguradoraDB;
-    } catch (error) {
-      throw new Error("error al guardar: " + error);
+    } catch (error) { 
+      throw new Error("error al guardar: " + error.detail);
     }
   }
 

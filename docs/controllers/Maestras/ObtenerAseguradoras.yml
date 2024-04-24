@@ -2,6 +2,8 @@
   get:
     tags:
       - Maestras
+    security:
+      - bearerAuth: []
     description: Obtener el listado de aseguradoras
     produces:
       - application/json
