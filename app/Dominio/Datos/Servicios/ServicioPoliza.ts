@@ -16,8 +16,8 @@ export class ServicioPoliza{
     return this.repositorio.capacidad(datos, vigiladoId)
   }
 
-  async obtenerVehiculos (params: any): Promise<any>{
-    return this.repositorio.obtenerVehiculos(params)
+  async obtenerVehiculos (params: any, id:string): Promise<any>{
+    return this.repositorio.obtenerVehiculos(params, id)
   }
 
 }

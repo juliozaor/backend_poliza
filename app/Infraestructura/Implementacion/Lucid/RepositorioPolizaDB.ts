@@ -239,41 +239,14 @@ const polizaIds = new Array()
     }
   }
 
-  async obtenerVehiculos(params: any): Promise<any> {  
-    const {pagina, limite} = params
-    /* try {
-      const { vigiladoId } = params
-      const sql = TblPolizas.query().preload('tipoPoliza').preload('vehiculos').preload('vigilado')
-   //   const sql = TblPolizas.query().where('vigiladoId',vigiladoId).preload('tipoPoliza').preload('vehiculos')
-   if (vigiladoId) {
-    sql.where('vigiladoId',vigiladoId)
-   }
-
-   const placas = new Array()
-   const polizas = await sql
-
-
-
-   polizas.map(poliza =>{
-    poliza.vehiculos.map(vehiculo =>{
-      placas.push(
-        { 
-          nit: poliza.vigilado.identificacion,
-          razonSocial: poliza.vigilado.nombre,
-          tipo: poliza.tipoPoliza.descripcion,
-          numeroPoliza: poliza.numero,
-          placa : vehiculo.placa,
-          cantidadPasajeros: vehiculo.pasajeros
-        }
-      )
-    })
-   })
-
-
-      return placas */
+  async obtenerVehiculos(params: any, id:string): Promise<any> {  
+    const {pagina, limite, vigiladoId, termino } = params
+    
       const placas= new Array();
 
-      const datos = await Database.from("tbl_vehiculos as tv")
+
+
+    let query = Database.from("tbl_vehiculos as tv")
     .select(
       "tu.usn_identificacion as nit",
       "tu.usn_nombre as razon_social",
@@ -284,8 +257,27 @@ const polizaIds = new Array()
     )
     .leftJoin("tbl_polizas as tp", "tp.pol_numero", "tv.veh_poliza")
     .leftJoin("tbl_tipos_polizas as ttp", "tp.pol_tipo_poliza_id", "ttp.tpo_id")
-    .leftJoin("tbl_usuarios as tu", "tp.pol_vigilado_id", "tu.usn_id")
-    .paginate(pagina, limite);
+    .leftJoin("tbl_usuarios as tu", "tp.pol_vigilado_id", "tu.usn_id");
+  
+  if (vigiladoId === id) {
+    query = query.where("tu.usn_id", vigiladoId);
+  }
+  
+  if (termino) {
+    query.andWhere(subquery => {
+      subquery.orWhereRaw("LOWER(tu.usn_identificacion) LIKE LOWER(?)", [`%${termino}%`])
+      subquery.orWhereRaw("LOWER(tu.usn_nombre) LIKE LOWER(?)", [`%${termino}%`])
+      subquery.orWhereRaw("LOWER(ttp.tpo_descripcion) LIKE LOWER(?)", [`%${termino}%`])
+      subquery.orWhereRaw("LOWER(tv.veh_placa) LIKE LOWER(?)", [`%${termino}%`])
+      .orWhereRaw("LOWER(CAST(tp.pol_numero AS TEXT)) LIKE LOWER(?)", [`%${termino}%`]);
+
+    })
+  }
+  
+  const datos = await query.paginate(pagina, limite);
+
+
+
 
     datos.forEach((dato) => {
       placas.push({
@@ -309,11 +301,6 @@ const polizaIds = new Array()
 
     return { placas, paginacion };
 
-
-    } catch (error) {
-      console.log(error);
-      
-    }
   }
 
 }

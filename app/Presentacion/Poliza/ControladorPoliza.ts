@@ -38,8 +38,8 @@ export default class ControladorRol {
 
    public async obtenerVehiculos ({request, response}:HttpContextContract ){
     
-    
-     const vehiculos = await this.service.obtenerVehiculos(request.all())
+    const { id } = await request.obtenerPayloadJWT()
+     const vehiculos = await this.service.obtenerVehiculos(request.all(), id)
      return vehiculos
    }
 
