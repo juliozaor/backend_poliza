@@ -20,6 +20,18 @@
         schema:
           type: integer
           format: int32
+      - name: vigiladoId
+        in: query
+        description: ID del vigilado
+        required: false
+        schema:
+          type: string
+      - name: termino
+        in: query
+        description: Término de búsqueda
+        required: false
+        schema:
+          type: string
     responses:
       '200':
         description: Petición exitosa
