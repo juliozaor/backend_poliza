@@ -109,7 +109,9 @@ const polizaIds = new Array()
     
     try {
       await this.guardarPoliza(polizaContractual, vigiladoId,1);
-      await this.guardarPoliza(polizaExtracontractual, vigiladoId,2);
+      if(polizaExtracontractual){
+      await this.guardarPoliza(polizaExtracontractual, vigiladoId,2)
+    }
       return {
         mensaje: "Polizas guardada correctamente",
       };
