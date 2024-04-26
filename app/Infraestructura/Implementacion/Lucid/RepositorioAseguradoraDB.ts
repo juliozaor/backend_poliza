@@ -8,9 +8,18 @@ export class RepositorioAseguradoraDB implements RepositorioAseguradora {
 
   async obtenerAseguradoras(param: any): Promise<{aseguradoras: Aseguradora[], paginacion: Paginador}> {
     const aseguradoras: Aseguradora[] = [];
-    const { pagina, limite } = param;
+    const { pagina, limite, termino } = param;
 
     const sql = TblAseguradoras.query();
+    if(termino){
+      sql.andWhere(subquery => {
+        subquery.orWhereRaw("LOWER(ase_nombre) LIKE LOWER(?)", [`%${termino}%`])
+      subquery.orWhereRaw("LOWER(ase_direccion) LIKE LOWER(?)", [`%${termino}%`])
+      subquery.orWhereRaw("LOWER(CAST(ase_nit AS TEXT)) LIKE LOWER(?)", [`%${termino}%`]);
+      })
+    }
+
+
     const aseguradorasDB = await sql.orderBy("nombre", "asc").paginate(pagina, limite);
 
     aseguradorasDB.forEach((aseguradorasDB) => {
