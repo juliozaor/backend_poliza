@@ -77,7 +77,6 @@ export class ServicioImportarVehiculos {
   async import(colComment: Excel.Column,hoja: Excel.Worksheet, poliza:number): Promise<Resultado<RespuestaImportacionExcel>> {
     
     const errores = await this.validarVehiculos(hoja, poliza)
-    console.log(errores);
     
     if (errores.length > 0) {
       const archivoB64 = await this.generarCsvErrores(errores)
@@ -237,7 +236,11 @@ export class ServicioImportarVehiculos {
     } else {
       try {
         // Consultar si la placa existe en la tabla TblVehiculos
-        const vehiculoExistente = await TblVehiculos.query().where('veh_placa', placa.toUpperCase()).first();
+        /* const vehiculoExistente = await TblVehiculos.query().where('veh_placa', placa.toUpperCase()).first(); */
+        const vehiculoExistente = await TblVehiculos.query()
+    .where('veh_placa', placa.toUpperCase())
+    .where('veh_poliza', '!=', poliza)
+    .first();
         if (vehiculoExistente) {
           errores.push({
             columna: 'A',
