@@ -11,8 +11,10 @@ import TblCapacidades from "App/Infraestructura/Datos/Entidad/Capacidades";
 import Database from "@ioc:Adonis/Lucid/Database";
 import { MapeadorPaginacionDB } from "./MapeadorPaginacionDB";
 import Errores from "App/Exceptions/Errores";
+import { ServicioEstados } from "App/Dominio/Datos/Servicios/ServicioEstados";
 
 export class RepositorioPolizaDB implements RepositorioPoliza {
+  private servicioEstados = new ServicioEstados();
   async visualizar(modalidadId: number, vigiladoId: string): Promise<any> {
    /*  let editable = true;
 
@@ -235,6 +237,7 @@ const polizaIds = new Array()
     
     try {
       await TblCapacidades.updateOrCreateMany(['modalidadId','numero'],capacidades);
+      this.servicioEstados.EnviadosSt(vigiladoId,1)
       return {
         mensaje: "Modalidades guardadas correctamente",
       };

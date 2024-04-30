@@ -227,11 +227,11 @@ export class ServicioImportarVehiculos {
         error: 'El valor no puede ser vacío.',
         valor: null
       });
-    } else if (placa.length > 6) {
+    } else if (placa.length !== 6) {
       errores.push({
         columna: 'A',
         fila: i.toString(),
-        error: 'La placa no puede tener más de 6 caracteres.',
+        error: 'La placa debe tener 6 caracteres.',
         valor: placa
       });
     } else {
