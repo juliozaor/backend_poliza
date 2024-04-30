@@ -77,6 +77,8 @@ export class ServicioImportarVehiculos {
   async import(colComment: Excel.Column,hoja: Excel.Worksheet, poliza:number): Promise<Resultado<RespuestaImportacionExcel>> {
     
     const errores = await this.validarVehiculos(hoja, poliza)
+    console.log(errores);
+    
     if (errores.length > 0) {
       const archivoB64 = await this.generarCsvErrores(errores)
       return new Resultado({
@@ -117,7 +119,7 @@ export class ServicioImportarVehiculos {
 
   }
 
-  async validarVehiculos(hoja: Excel.Worksheet, poliza: number): Promise<ErrorFormatoImportarExcel[]> {
+  /* async validarVehiculos(hoja: Excel.Worksheet, poliza: number): Promise<ErrorFormatoImportarExcel[]> {
     let errores: ErrorFormatoImportarExcel[] = []
     let seEncontroFilaValida = false; 
     hoja.eachRow(fila => {
@@ -142,7 +144,27 @@ export class ServicioImportarVehiculos {
                 error: `La placa no pude tener mas de 6 caracteres`,
                 valor: placa
               })
+            }          
+            let placaEx:any
+               TblVehiculos.findBy('veh_placa', placa.toUpperCase()).then( async resp =>{
+                placaEx = await resp?.placa
+                console.log(placaEx);
+                
+              });
+              console.log(placaEx);
+              
+              if(existePlaca)
+             { 
+              console.log("Entro");
+              
+             errores.push({
+                columna: 'A',
+                fila: fila.number.toString(),
+                error: `La placa ya esta registrada en otra poliza`,
+                valor: placa
+              })
             }
+
           }
         }
 
@@ -178,7 +200,89 @@ export class ServicioImportarVehiculos {
         valor: null
       });
     }
+    
+    
     return errores
+  } */
+
+  async validarVehiculos(hoja: Excel.Worksheet, poliza: number): Promise<ErrorFormatoImportarExcel[]> {
+    let errores: ErrorFormatoImportarExcel[] = [];
+  let seEncontroFilaValida = false;
+
+  const rowCount = hoja.rowCount;
+  for (let i = 2; i <= rowCount; i++) {
+    const fila = hoja.getRow(i);
+
+    const placaCell = fila.getCell('A');
+    const pasajerosCell = fila.getCell('B');
+
+    const placa = placaCell ? placaCell.value?.toString().trim() : null;
+    const pasajeros = pasajerosCell ? pasajerosCell.value?.toString().trim() : null;
+
+    // Validar existencia de placa
+    if (!placa) {
+      errores.push({
+        columna: 'A',
+        fila: i.toString(),
+        error: 'El valor no puede ser vacío.',
+        valor: null
+      });
+    } else if (placa.length > 6) {
+      errores.push({
+        columna: 'A',
+        fila: i.toString(),
+        error: 'La placa no puede tener más de 6 caracteres.',
+        valor: placa
+      });
+    } else {
+      try {
+        // Consultar si la placa existe en la tabla TblVehiculos
+        const vehiculoExistente = await TblVehiculos.query().where('veh_placa', placa.toUpperCase()).first();
+        if (vehiculoExistente) {
+          errores.push({
+            columna: 'A',
+            fila: i.toString(),
+            error: 'La placa ya existe en otra poliza.',
+            valor: placa
+          });
+        }
+      } catch (error) {
+        console.error('Error al consultar la base de datos:', error);
+      }
+    }
+
+    // Validar existencia de pasajeros
+    if (!pasajeros) {
+      errores.push({
+        columna: 'B',
+        fila: i.toString(),
+        error: 'El valor no puede ser vacío.',
+        valor: null
+      });
+    } else if (pasajeros.length > 2) {
+      errores.push({
+        columna: 'B',
+        fila: i.toString(),
+        error: 'La cantidad de pasajeros no puede tener más de 2 caracteres.',
+        valor: pasajeros
+      });
+    }
+
+    if (!seEncontroFilaValida) {
+      seEncontroFilaValida = true;
+    }
+  }
+
+  if (!seEncontroFilaValida) {
+    errores.push({
+      columna: '',
+      fila: '',
+      error: 'El archivo está vacío o no contiene filas válidas.',
+      valor: null
+    });
+  }
+
+  return errores;
   }
 
   generarCsvErrores(errores: ErrorFormatoImportarExcel[]): Promise<string>{
