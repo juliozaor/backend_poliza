@@ -10,6 +10,7 @@ import TblArchivo from "App/Infraestructura/Datos/Entidad/Archivos";
 import TblCapacidades from "App/Infraestructura/Datos/Entidad/Capacidades";
 import Database from "@ioc:Adonis/Lucid/Database";
 import { MapeadorPaginacionDB } from "./MapeadorPaginacionDB";
+import Errores from "App/Exceptions/Errores";
 
 export class RepositorioPolizaDB implements RepositorioPoliza {
   async visualizar(modalidadId: number, vigiladoId: string): Promise<any> {
@@ -115,9 +116,8 @@ const polizaIds = new Array()
       return {
         mensaje: "Polizas guardada correctamente",
       };
-    } catch (error) {
-      console.log(error);
-      
+    } catch (error) {      
+      throw error;      
     }
   }
 
@@ -131,11 +131,14 @@ const polizaIds = new Array()
 
     const polizaDBExiste = await TblPolizas.findBy('pol_numero', poliza.numero);
         
-    if (polizaDBExiste) {
-      polizaDBExiste.establecePolizaConId(poliza);
-      await polizaDBExiste.save();
+    if (polizaDBExiste) {      
+      /* polizaDBExiste.establecePolizaConId(poliza);
+      await polizaDBExiste.save(); */
       //polizaId = polizaDBExiste.id;
+      throw new Errores(`La poliza'${poliza.numero}', ya existe`, 400);
+      
     }else{
+      console.log("No Existe");
       const polizaDB = new TblPolizas();
       polizaDB.establecerPolizaDb(poliza);
       polizaDB.vigiladoId = vigiladoId;
