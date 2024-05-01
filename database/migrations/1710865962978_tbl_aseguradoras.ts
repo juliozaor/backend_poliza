@@ -9,7 +9,7 @@ export default class extends BaseSchema {
       table.bigInteger('ase_nit').unique()
       table.string('ase_nombre', 200)
       table.string('ase_direccion',255)
-      table.integer('ase_telefono')
+      table.bigInteger('ase_telefono')
       table.boolean('ase_estado').defaultTo(true)
       table.timestamp('ase_creado', { useTz: true })
       table.timestamp('ase_actualizado', { useTz: true })

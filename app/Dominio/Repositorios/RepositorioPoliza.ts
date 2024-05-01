@@ -1,3 +1,6 @@
 export interface RepositorioPoliza {
-  visualizar(): Promise<any>
+  visualizar(modalidadId:number, vigiladoId: string): Promise<any>
+  guardar(datos:any, vigiladoId: string): Promise<any>
+  capacidad(datos:any, vigiladoId: string): Promise<any>
+  obtenerVehiculos(params: any, id:string): Promise<any>
 }

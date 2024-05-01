@@ -20,9 +20,9 @@ export class ServicioExportacion {
     return buffer;
   }
 
-  public async encuestaToXLSX(data: any[], cabeceras: any[]) {
+  public async encuestaToXLSX(data: any[], cabeceras: any[]) {    
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Datos');
+    const worksheet = workbook.addWorksheet('VehiculosExport');
 
     // Definir encabezados de columna
     worksheet.columns = cabeceras;

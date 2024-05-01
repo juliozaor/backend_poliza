@@ -2,6 +2,8 @@
   get:
     tags:
       - Usuario
+    security:
+      - bearerAuth: []
     description: Listar usuarios
     parameters:
       - name: termino

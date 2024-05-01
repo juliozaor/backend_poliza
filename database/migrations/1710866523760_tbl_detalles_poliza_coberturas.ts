@@ -6,7 +6,7 @@ export default class extends BaseSchema {
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('dpl_id')
-      table.integer('dpl_poliza_id').references('pol_id').inTable('tbl_polizas')
+      table.bigInteger('dpl_poliza').references('pol_numero').inTable('tbl_polizas')
       table.integer('dpl_cobertura_id').references('cob_id').inTable('tbl_coberturas')
       table.integer('dpl_valor_asegurado',3)
       table.integer('dpl_limite',3)

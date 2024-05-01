@@ -8,19 +8,19 @@ export default class TblDetallesPolizaCoberturas extends BaseModel {
   @column({ columnName: 'dpl_valor_asegurado' }) public valorAsegurado: number
   @column({ columnName: 'dpl_limite' }) public limite: number
   @column({ columnName: 'dpl_deducible' }) public deducible: number
-  @column({ columnName: 'dpl_poliza_id' }) public polizaId: number
+  @column({ columnName: 'dpl_poliza' }) public poliza: number
   @column({ columnName: 'dpl_cobertura_id' }) public coberturaId: number
   
   
   @column.dateTime({ autoCreate: true , columnName: 'dpl_creado'}) public createdAt: DateTime
   @column.dateTime({ autoCreate: true, autoUpdate: true, columnName: 'dpl_actualizado' }) public updatedAt: DateTime
 
-
+  
   @belongsTo(() => TblPolizas, {
-    localKey: 'id',
-    foreignKey: 'polizaId',
+    localKey: 'numero',
+    foreignKey: 'poliza',
   })
-  public poliza: BelongsTo<typeof TblPolizas>
+  public polizas: BelongsTo<typeof TblPolizas>
 
   @belongsTo(() => TblCoberturas, {
     localKey: 'id',

@@ -1,17 +1,18 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import { ServicioExportacion } from 'App/Dominio/Datos/Servicios/ServicioExportacion';
-import { ReporteTrazabilidad } from 'App/Infraestructura/Util/ReporteTrazabilidad';
-
+import { ServicioPoliza } from 'App/Dominio/Datos/Servicios/ServicioPoliza';
+import { RepositorioPolizaDB } from 'App/Infraestructura/Implementacion/Lucid/RepositorioPolizaDB';
+/* 
 const data = [
   { name: 'John Doe', email: 'john@example.com' },
   { name: 'Jane Smith', email: 'jane@example.com' },
   // Otros elementos del arreglo
 ];
-
+ */
 export default class ControladorExportacion {
   private servicioExportacion = new ServicioExportacion();
-  private reporteTrazabilidad = new ReporteTrazabilidad();
-  public async exportToXLSX({ response }: HttpContextContract) {
+  private servicioPoliza = new ServicioPoliza(new RepositorioPolizaDB())
+  /* public async exportToXLSX({ response }: HttpContextContract) {
     const cabeceras = [
       { header: 'ID', key: "id", width: 40 },
       { header: 'NIT', key: "nit", width: 40 },
@@ -35,29 +36,27 @@ export default class ControladorExportacion {
 
  return data
     
-   /*  const buffer = await this.servicioExportacion.encuestaToXLSX(data, cabeceras)
-
-    // Configurar opciones de respuesta
-    response.header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    response.header('Content-Disposition', 'attachment; filename=datos.xlsx');
-
-    // Enviar el archivo XLSX como respuesta
-    response.send(buffer); */
   }
-
+ */
   
 
-  public async encuestaToXLSX({ request, response }: HttpContextContract) {
-const {idReporte} = request.all()
-const data = await this.reporteTrazabilidad.Encuesta(idReporte)
+  public async vehiculosToXLSX({ request, response }: HttpContextContract) {
+const  id  = '0'
+const parametros = request.all()
+parametros.pagina = undefined
+parametros.limite = undefined
+
+const data = await this.servicioPoliza.obtenerVehiculos(request.all(), id)
+
 const cabeceras = [
-  { header: 'No', key: 'no', width: 10 },
-  { header: 'Pregunta', key: 'pregunta', width: 100 },
-  { header: '¿Existe?', key: 'existe', width: 10 },
-  { header: 'Tipo de evidencia', key: 'tipoEvidencia', width: 40 },
-  { header: 'Documento', key: 'documento', width: 30 },
+  { header: 'NIt', key: 'nit', width: 20 },
+  { header: 'Razón social', key: 'razon_social', width: 50 },
+  { header: 'Tipo', key: 'tipo', width: 50 },
+  { header: 'Número de póliza', key: 'numero_poliza', width: 20 },
+  { header: 'Placa', key: 'placa', width: 20 },
+  { header: 'Pasajeros', key: 'pasajeros', width: 20 },
 ]
-const buffer = await this.servicioExportacion.encuestaToXLSX(data, cabeceras)
+const buffer = await this.servicioExportacion.encuestaToXLSX(data.placas, cabeceras)
 
     // Configurar opciones de respuesta
     response.header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

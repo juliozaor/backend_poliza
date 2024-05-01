@@ -4,5 +4,7 @@ const accion_path = '../../../app/Presentacion/Poliza/ControladorPoliza'
 
 Route.group(() => {
   Route.get('', accion_path + '.visualizar')
+  Route.get('/vehiculos', accion_path + '.obtenerVehiculos')
   Route.post('', accion_path + '.guardar')
+  Route.post('/capacidades', accion_path + '.capacidad')
 }).prefix('api/v1/poliza').middleware('autenticacionJwt')

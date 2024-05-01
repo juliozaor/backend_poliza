@@ -44,7 +44,7 @@ if(params.termino){
 
       /* usuarios.push(usuariosDB.obtenerUsuario()) */
       usuarios.push({
-      //  id: usuarioDB.id,
+        id: usuarioDB.id,
         nombre: usuarioDB.nombre,
         identificacion: usuarioDB.identificacion
       })
