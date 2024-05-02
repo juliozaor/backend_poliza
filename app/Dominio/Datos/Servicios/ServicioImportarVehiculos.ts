@@ -83,7 +83,17 @@ export class ServicioImportarVehiculos {
     let libro = new Excel.Workbook()
     libro = await libro.xlsx.readFile(filelocation)
     let hoja = libro.getWorksheet('Hoja1')! // get sheet name
+    if(!hoja){
+      return new Resultado({
+        estado: 500,
+        mensaje: `Verifique la estructura del archivo o descargue nuevamente la plantilla`,
+        exitoso: false
+      });
+    }
     let colComment = hoja.getColumn('A') //column name
+
+   
+    
     
       return this.import(colComment, hoja, poliza, id);
     
