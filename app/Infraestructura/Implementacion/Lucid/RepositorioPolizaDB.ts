@@ -118,7 +118,7 @@ const polizaIds = new Array()
     //Borrar las placas de este usuario que no tengan poliza
     await Database.rawQuery(
     `DELETE FROM Vehiculo
-    WHERE vigiladoId = ${vigiladoId} 
+    WHERE vigiladoId = '${vigiladoId}' 
     AND placa NOT IN (
       SELECT v.placa
       FROM Vehiculo v
