@@ -8,6 +8,8 @@ import { ErrorFormatoImportarExcel } from './Dtos/ErrorFormatoImportarExcel';
 import { RespuestaImportacionExcel } from './Dtos/RespuestaImportacionExcel';
 import TblVehiculos from 'App/Infraestructura/Datos/Entidad/Vehiculos';
 import { Vehiculo } from '../Entidades/Vehiculo';
+import TblPolizas from 'App/Infraestructura/Datos/Entidad/poliza';
+import Errores from 'App/Exceptions/Errores';
 
 export class ServicioImportarVehiculos {
   async importDataXLSX(
@@ -17,6 +19,20 @@ export class ServicioImportarVehiculos {
   ): Promise<Resultado<RespuestaImportacionExcel>> {
     let rutaArchivo;
     try {
+
+
+      const polizaDBExiste = await TblPolizas.findBy('pol_numero', poliza);
+        
+      if (polizaDBExiste) {      
+        return new Resultado({
+          estado: 500,
+          mensaje: `La poliza'${poliza}', ya fue registrada anteriormente`,
+          exitoso: false
+        });
+      }
+
+
+
       const fname = `${new Date().getTime()}.${archivo.extname}`;
       const dir = 'uploads/';
 
@@ -37,6 +53,8 @@ export class ServicioImportarVehiculos {
 
       const filePath = path.resolve(`${dir}${fname}`);
       rutaArchivo = filePath;
+
+      
       // Resto de la lógica del servicio...
       let resultado = await this.importVehiculos(filePath, poliza, id)
       return resultado
@@ -154,10 +172,18 @@ export class ServicioImportarVehiculos {
       try {
         // Consultar si la placa existe en la tabla TblVehiculos
         /* const vehiculoExistente = await TblVehiculos.query().where('veh_placa', placa.toUpperCase()).first(); */
-        const vehiculoExistente = await TblVehiculos.query()
+        /* const vehiculoExistente = await TblVehiculos.query()
     .where('veh_placa', placa.toUpperCase())
     .where('veh_poliza', '!=', poliza)
-    .first();
+    .first(); */
+    const vehiculoExistente = await TblVehiculos.query()
+  .where('veh_placa', placa.toUpperCase())
+  .where('veh_poliza', '!=', poliza)
+  .whereExists(function () {
+    this.from('TblPolizas')
+      .whereRaw('TblPolizas.numero = TblVehiculos.veh_poliza');
+  })
+  .first();
         if (vehiculoExistente) {
           errores.push({
             columna: 'A',
