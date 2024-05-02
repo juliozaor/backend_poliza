@@ -44,13 +44,14 @@ export default class Controladorvehiculo {
     }
     
     const { poliza } = request.all();
+    
     if (!poliza) {
       return response.status(400).send({ mensaje: "La poliza es requerida" });
     }
-
+    const { id } = await request.obtenerPayloadJWT()
     try {
       const respuesta = await this.servicioImportacionVehiculos.importDataXLSX(
-        archivo, poliza
+        archivo, poliza, id
       );
       
       return response

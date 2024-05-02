@@ -115,6 +115,18 @@ const polizaIds = new Array()
       if(polizaExtracontractual){
       await this.guardarPoliza(polizaExtracontractual, vigiladoId,2)
     }
+    //Borrar las placas de este usuario que no tengan poliza
+    await Database.rawQuery(
+    `DELETE FROM Vehiculo
+    WHERE vigiladoId = ${vigiladoId} 
+    AND placa NOT IN (
+      SELECT v.placa
+      FROM Vehiculo v
+      LEFT JOIN Poliza p ON v.poliza = p.id
+      WHERE p.id IS NOT NULL`
+  )
+
+
       return {
         mensaje: "Polizas guardada correctamente",
       };

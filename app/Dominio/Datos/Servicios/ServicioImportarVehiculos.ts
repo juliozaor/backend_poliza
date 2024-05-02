@@ -12,7 +12,8 @@ import { Vehiculo } from '../Entidades/Vehiculo';
 export class ServicioImportarVehiculos {
   async importDataXLSX(
     archivo: MultipartFileContract,
-    poliza: number
+    poliza: number,
+    id:string
   ): Promise<Resultado<RespuestaImportacionExcel>> {
     let rutaArchivo;
     try {
@@ -37,7 +38,7 @@ export class ServicioImportarVehiculos {
       const filePath = path.resolve(`${dir}${fname}`);
       rutaArchivo = filePath;
       // Resto de la lógica del servicio...
-      let resultado = await this.importVehiculos(filePath, poliza)
+      let resultado = await this.importVehiculos(filePath, poliza, id)
       return resultado
     } catch (error) {
       console.error(error);
@@ -59,14 +60,14 @@ export class ServicioImportarVehiculos {
     }
   }
 
-  async importVehiculos(filelocation, poliza: number): Promise<Resultado<RespuestaImportacionExcel>> {
+  async importVehiculos(filelocation, poliza: number, id:string): Promise<Resultado<RespuestaImportacionExcel>> {
     let resultado: Resultado<ErrorFormatoImportarExcel[]>
     let libro = new Excel.Workbook()
     libro = await libro.xlsx.readFile(filelocation)
     let hoja = libro.getWorksheet('Hoja1')! // get sheet name
     let colComment = hoja.getColumn('A') //column name
     
-      return this.import(colComment, hoja, poliza);
+      return this.import(colComment, hoja, poliza, id);
     
     /* return new Resultado({
       estado: 500,
@@ -74,7 +75,7 @@ export class ServicioImportarVehiculos {
     }) */
   }
 
-  async import(colComment: Excel.Column,hoja: Excel.Worksheet, poliza:number): Promise<Resultado<RespuestaImportacionExcel>> {
+  async import(colComment: Excel.Column,hoja: Excel.Worksheet, poliza:number, id:string): Promise<Resultado<RespuestaImportacionExcel>> {
     
     const errores = await this.validarVehiculos(hoja, poliza)
     
@@ -99,7 +100,8 @@ export class ServicioImportarVehiculos {
           const inputPlaca: Vehiculo = {
             placa,
             pasajeros,
-            poliza
+            poliza,
+            vigiladoId:id
           }
           try {
             await TblVehiculos.updateOrCreate({ placa: inputPlaca.placa }, inputPlaca)
@@ -118,91 +120,6 @@ export class ServicioImportarVehiculos {
 
   }
 
-  /* async validarVehiculos(hoja: Excel.Worksheet, poliza: number): Promise<ErrorFormatoImportarExcel[]> {
-    let errores: ErrorFormatoImportarExcel[] = []
-    let seEncontroFilaValida = false; 
-    hoja.eachRow(fila => {
-      if (fila.number > 1) {
-        seEncontroFilaValida = true;
-        const placa = fila.getCell('A').value?.valueOf()
-        const pasajeros = fila.getCell('B').value?.valueOf()
-        //Validar existencia
-        if (!placa) {
-          errores.push({
-            columna: 'A',
-            fila: fila.number.toString(),
-            error: 'El valor no puede ser vacío.',
-            valor: null
-          })
-        } else {
-          if ( typeof placa === 'string') {
-            if(placa.length > 6){
-              errores.push({
-                columna: 'A',
-                fila: fila.number.toString(),
-                error: `La placa no pude tener mas de 6 caracteres`,
-                valor: placa
-              })
-            }          
-            let placaEx:any
-               TblVehiculos.findBy('veh_placa', placa.toUpperCase()).then( async resp =>{
-                placaEx = await resp?.placa
-                console.log(placaEx);
-                
-              });
-              console.log(placaEx);
-              
-              if(existePlaca)
-             { 
-              console.log("Entro");
-              
-             errores.push({
-                columna: 'A',
-                fila: fila.number.toString(),
-                error: `La placa ya esta registrada en otra poliza`,
-                valor: placa
-              })
-            }
-
-          }
-        }
-
-        if (!pasajeros) {
-          errores.push({
-            columna: 'B',
-            fila: fila.number.toString(),
-            error: 'El valor no puede ser vacío.',
-            valor: null
-          })
-        } else {
-          if ( typeof pasajeros === 'number') {            
-            if(pasajeros.toString().length > 2){
-              errores.push({
-                columna: 'B',
-                fila: fila.number.toString(),
-                error: `La cantidad de pasajeros no pude tener mas de 2 caracteres`,
-                valor: pasajeros
-              })
-            }
-          
-          }
-        }
-
-      }
-    })
-
-    if (!seEncontroFilaValida) {
-      errores.push({
-        columna: '',
-        fila: '',
-        error: 'El archivo está vacío o no contiene filas válidas.',
-        valor: null
-      });
-    }
-    
-    
-    return errores
-  } */
 
   async validarVehiculos(hoja: Excel.Worksheet, poliza: number): Promise<ErrorFormatoImportarExcel[]> {
     let errores: ErrorFormatoImportarExcel[] = [];

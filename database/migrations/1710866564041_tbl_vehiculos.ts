@@ -9,6 +9,7 @@ export default class extends BaseSchema {
       table.string('veh_placa', 6)
       table.integer('veh_pasajeros', 2)
       table.bigInteger('veh_poliza')
+      table.uuid('veh_vigilado_id')
       table.timestamp('veh_creado', { useTz: true })
       table.timestamp('veh_actualizado', { useTz: true })
     })
