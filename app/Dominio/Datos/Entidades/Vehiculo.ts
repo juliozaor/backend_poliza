@@ -3,5 +3,6 @@ export class Vehiculo {
   placa: string
   pasajeros: number
   poliza: number  
+  vigiladoId: string  
 }
 
