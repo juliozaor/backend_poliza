@@ -29,7 +29,7 @@ export default class Controladorvehiculo {
 
   public async importar({ request, response }: HttpContextContract) {
     const archivo = request.file("archivo", {
-      extnames: ["xlsx", "xls"],
+      extnames: ["xlsx"],
     });
   /*   const archivo = request.file("archivo"); */
     
@@ -52,7 +52,7 @@ if (!extensionRegex.test(archivo.extname!)) {
       return response
         .status(415)
         .send({
-          mensaje: `Formato inválido: no se puede cargar el archivo seleccionado. Inténtalo nuevamente, los tipos de archivo permitido son '.xlsx', '.xls'`,
+          mensaje: `Formato inválido: no se puede cargar el archivo seleccionado. Inténtalo nuevamente, los tipos de archivo permitido son '.xlsx'`,
         }); 
     }
     
