@@ -256,6 +256,7 @@ const polizaIds = new Array()
       };
     } catch (error) {
       console.log(error);
+      throw new Errores(`Se presento un problema al cargar las modalidades`, 400);
       
     }
   }
