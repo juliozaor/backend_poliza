@@ -168,7 +168,7 @@ export class ServicioImportarVehiculos {
       errores.push({
         columna: 'A',
         fila: i.toString(),
-        error: 'El valor no puede ser vacío.',
+        error: 'Es necesario proporcionar un valor en el campo',
         valor: null
       });
     } else if (placa.length !== 6) {
@@ -212,14 +212,14 @@ export class ServicioImportarVehiculos {
       errores.push({
         columna: 'B',
         fila: i.toString(),
-        error: 'El valor no puede ser vacío.',
+        error: 'Es necesario proporcionar un valor en el campo',
         valor: null
       });
     } else if (pasajeros.length > 2) {
       errores.push({
         columna: 'B',
         fila: i.toString(),
-        error: 'La cantidad de pasajeros no puede tener más de 2 caracteres.',
+        error: 'La cantidad de pasajeros no puede ser superior a 2 caracteres.',
         valor: pasajeros
       });
     }
@@ -233,7 +233,7 @@ export class ServicioImportarVehiculos {
     errores.push({
       columna: '',
       fila: '',
-      error: 'El archivo está vacío o no contiene filas válidas.',
+      error: 'El archivo no contiene datos o son incorrectos',
       valor: null
     });
   }
@@ -243,7 +243,7 @@ export class ServicioImportarVehiculos {
 
   generarCsvErrores(errores: ErrorFormatoImportarExcel[]): Promise<string>{
     const dataCsv: any[][] = []
-    const cabeceras = [ "Nro", "Celda", "Descripción" ]
+    const cabeceras = [ "Nro", "Celda", "Detalle" ]
     dataCsv.push(cabeceras)
     errores.forEach( (error, indice) => {
       dataCsv.push([ indice + 1, `${error.columna}${error.fila}`, error.error ])

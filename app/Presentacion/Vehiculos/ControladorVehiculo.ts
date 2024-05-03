@@ -31,16 +31,29 @@ export default class Controladorvehiculo {
     const archivo = request.file("archivo", {
       extnames: ["xlsx", "xls"],
     });
+  /*   const archivo = request.file("archivo"); */
+    
     if (!archivo) {
       return response.status(400).send({ mensaje: "No se encontro archivo" });
     }
+    console.log(archivo.extname!);
+
+    // Expresión regular para verificar la extensión
+const extensionRegex = /(xlsx|xls)$/i;
+
+/* // Verificar si el nombre del archivo coincide con la expresión regular
+if (!extensionRegex.test(archivo.extname!)) {
+  return response.status(415).send({
+    mensaje: "Formato inválido: no se puede cargar el archivo seleccionado. Inténtalo nuevamente, los tipos de archivo permitidos son '.xlsx' y '.xls'",
+  });
+} */
 
     if (!archivo.isValid) {
       return response
         .status(415)
         .send({
           mensaje: `Formato inválido: no se puede cargar el archivo seleccionado. Inténtalo nuevamente, los tipos de archivo permitido son '.xlsx', '.xls'`,
-        });
+        }); 
     }
     
     const { poliza } = request.all();
