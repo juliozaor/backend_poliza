@@ -10,6 +10,7 @@ import TblVehiculos from 'App/Infraestructura/Datos/Entidad/Vehiculos';
 import { Vehiculo } from '../Entidades/Vehiculo';
 import TblPolizas from 'App/Infraestructura/Datos/Entidad/poliza';
 import Errores from 'App/Exceptions/Errores';
+import Database from '@ioc:Adonis/Lucid/Database';
 
 export class ServicioImportarVehiculos {
   async importDataXLSX(
@@ -186,15 +187,29 @@ export class ServicioImportarVehiculos {
     .where('veh_placa', placa.toUpperCase())
     .where('veh_poliza', '!=', poliza)
     .first(); */
-    const vehiculoExistente = await TblVehiculos.query()
-  .where('veh_placa', placa.toUpperCase())
+ /*    const vehiculoExistente = await TblVehiculos.query() */
+  /* .where('veh_placa', placa.toUpperCase())
   .where('veh_poliza', '!=', poliza)
   .whereExists(function () {
     this.from('tbl_polizas')
       .whereRaw('tbl_polizas.numero = tbl_vehiculos.veh_poliza');
   })
-  .first();
-        if (vehiculoExistente) {
+  .first(); */
+
+  const vehiculoExistente = await Database.rawQuery(`
+  SELECT v.*
+  FROM tbl_vehiculos v
+  WHERE v.veh_placa = '${placa.toUpperCase()}'
+  AND v.veh_poliza <> '${poliza}' 
+    AND EXISTS (
+      SELECT 1
+      FROM tbl_polizas p
+      WHERE p.pol_numero = v.veh_poliza
+    )
+  LIMIT 1
+`);
+ 
+        if (vehiculoExistente && vehiculoExistente.rows && vehiculoExistente.rows.length > 0) {
           errores.push({
             columna: 'A',
             fila: i.toString(),
