@@ -42,15 +42,14 @@ export class ServicioImportarVehiculos {
         name: fname
       });
 
-      if (!archivo.isValid) {
+  /*     if (!archivo.isValid) {
         console.log('Error al mover el archivo');
-        /* return ['Error moving files', 500]; */
         return new Resultado({
           estado: 500,
           mensaje: 'Error al mover el archivo',
           exitoso: false
         });
-      }
+      } */
 
       const filePath = path.resolve(`${dir}${fname}`);
       rutaArchivo = filePath;
