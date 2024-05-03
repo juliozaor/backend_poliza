@@ -190,8 +190,8 @@ export class ServicioImportarVehiculos {
   .where('veh_placa', placa.toUpperCase())
   .where('veh_poliza', '!=', poliza)
   .whereExists(function () {
-    this.from('TblPolizas')
-      .whereRaw('TblPolizas.numero = TblVehiculos.veh_poliza');
+    this.from('tbl_polizas')
+      .whereRaw('tbl_polizas.numero = tbl_vehiculos.veh_poliza');
   })
   .first();
         if (vehiculoExistente) {
