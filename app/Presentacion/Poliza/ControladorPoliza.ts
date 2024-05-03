@@ -41,8 +41,13 @@ export default class ControladorRol {
   public async capacidad ({request, response}:HttpContextContract ){
     
     const { id } = await request.obtenerPayloadJWT()
-     const polizas = await this.service.capacidad(request.all(), id)
-     return polizas
+    try {
+      const polizas = await this.service.capacidad(request.all(), id)
+      return polizas
+     
+    } catch (error) {
+      throw error;
+    }
    }
 
    public async obtenerVehiculos ({request, response}:HttpContextContract ){

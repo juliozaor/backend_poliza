@@ -29,38 +29,36 @@ export default class Controladorvehiculo {
 
   public async importar({ request, response }: HttpContextContract) {
     const archivo = request.file("archivo", {
-      extnames: ["xlsx", "xls"],
+      extnames: ["xlsx"],
     });
     if (!archivo) {
-      return response.status(400).send({ mensaje: "No se encontro archivo" });
-    }
-
-    if (!archivo.isValid) {
-      return response
-        .status(415)
-        .send({
-          mensaje: `Formato inválido: no se puede cargar el archivo seleccionado. Inténtalo nuevamente, los tipos de archivo permitido son '.xlsx', '.xls'`,
-        });
+      return response.status(400).send({ mensaje: "No se encontró archivo" });
     }
     
+    // Limpiar el nombre del archivo de caracteres especiales
+const nombreArchivoLimpio = archivo.clientName.replace(/[^\w.-]/g, '_');
+
+// Validar la extensión del archivo después de limpiar su nombre
+if (!nombreArchivoLimpio.toLowerCase().endsWith(".xlsx")) {
+  return response.status(415).send({
+    mensaje: `Formato inválido: no se puede cargar el archivo seleccionado. Inténtalo nuevamente, los tipos de archivo permitidos son '.xlsx'`,
+  });
+}
+
     const { poliza } = request.all();
     
     if (!poliza) {
-      return response.status(400).send({ mensaje: "La poliza es requerida" });
+      return response.status(400).send({ mensaje: "La póliza es requerida" });
     }
-    const { id } = await request.obtenerPayloadJWT()
+    const { id } = await request.obtenerPayloadJWT();
     try {
       const respuesta = await this.servicioImportacionVehiculos.importDataXLSX(
         archivo, poliza, id
       );
-      
-      return response
-        .status(respuesta.estado)
-        .send(respuesta.datos ?? {mensaje: respuesta.mensaje});
+    
+      return response.status(respuesta.estado).send(respuesta.datos ?? { mensaje: respuesta.mensaje });
     } catch (error) {
-      return response
-        .status(400)
-        .send({ mensaje: "Se presento un error al cargar el archivo" });
+      return response.status(400).send({ mensaje: "Se presentó un error al cargar el archivo" });
     }
   }
 }

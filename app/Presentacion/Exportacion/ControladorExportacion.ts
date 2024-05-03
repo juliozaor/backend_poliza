@@ -44,7 +44,7 @@ export default class ControladorExportacion {
 const  id  = '0'
 const parametros = request.all()
 parametros.pagina = undefined
-parametros.limite = undefined
+parametros.limite = 10000000000
 
 const data = await this.servicioPoliza.obtenerVehiculos(request.all(), id)
 
