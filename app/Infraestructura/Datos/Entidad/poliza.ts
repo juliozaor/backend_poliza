@@ -15,6 +15,7 @@ export default class TblPolizas extends BaseModel {
   @column({ columnName: 'pol_aseguradora_id' }) public aseguradoraId: number
   @column({ columnName: 'pol_tipo_poliza_id' }) public tipoPolizaId?: number
   @column({ columnName: 'pol_vigilado_id' }) public vigiladoId?: string
+  @column({ columnName: 'pol_responsabilidad' }) public responsabilidad?: boolean
   @column({ columnName: 'pol_estado' }) public estado?: boolean
   @column.dateTime({ autoCreate: true , columnName: 'pol_creado'}) public createdAt: DateTime
   @column.dateTime({ autoCreate: true, autoUpdate: true, columnName: 'pol_actualizado' }) public updatedAt: DateTime
@@ -28,6 +29,7 @@ export default class TblPolizas extends BaseModel {
     this.finVigencia = poliza.finVigencia
     this.aseguradoraId = poliza.aseguradoraId
     this.tipoPolizaId = poliza.tipoPolizaId
+    this.responsabilidad = poliza.responsabilidad
     this.estado = poliza.estado
     this.vigiladoId = poliza.vigiladoId
   }
@@ -38,6 +40,7 @@ export default class TblPolizas extends BaseModel {
     this.finVigencia = poliza.finVigencia
     this.aseguradoraId = poliza.aseguradoraId
     this.tipoPolizaId = poliza.tipoPolizaId
+    this.responsabilidad = poliza.responsabilidad
     this.estado = poliza.estado
   }
 
@@ -49,6 +52,7 @@ export default class TblPolizas extends BaseModel {
     poliza.finVigencia = this.finVigencia
     poliza.aseguradoraId = this.aseguradoraId
     poliza.tipoPolizaId = this.tipoPolizaId
+    poliza.responsabilidad = this.responsabilidad
     poliza.estado = this.estado
     poliza.vigiladoId = this.vigiladoId
 
@@ -66,7 +70,7 @@ export default class TblPolizas extends BaseModel {
     localKey: 'numero',
     foreignKey: 'polizaId',
   })
-  public responsabilidad: HasOne<typeof TblResponsabilidades>
+  public responsabilidades: HasOne<typeof TblResponsabilidades>
 
   @hasMany(()=>TblVehiculos, {
     localKey: 'numero',

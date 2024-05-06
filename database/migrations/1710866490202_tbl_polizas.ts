@@ -12,6 +12,7 @@ export default class extends BaseSchema {
       table.integer('pol_tipo_poliza_id').references('tpo_id').inTable('tbl_tipos_polizas')
       table.date('pol_inicio_vigencia')
       table.date('pol_fin_vigencia')
+      table.boolean('pol_responsabilidad').defaultTo(false)
       table.boolean('pol_estado').defaultTo(true)
       table.timestamp('pol_creado', { useTz: true })
       table.timestamp('pol_actualizado', { useTz: true })

@@ -6,5 +6,6 @@ export class Poliza {
   inicioVigencia: string
   finVigencia: string
   estado?: boolean;
+  responsabilidad?: boolean;
   vigiladoId?: string;
 }

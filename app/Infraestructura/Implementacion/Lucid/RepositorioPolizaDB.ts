@@ -20,7 +20,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
 
 const polizaIds = new Array()     
 
-    const polizaContractual = await TblPolizas.query().preload('responsabilidad')
+    const polizaContractual = await TblPolizas.query().preload('responsabilidades')
       .where("pol_modalidad_id", modalidadId)
       .where("pol_vigilado_id", vigiladoId)
       .where("pol_tipo_poliza_id", 1)
@@ -35,7 +35,7 @@ const polizaIds = new Array()
         polizaIds.push(polizaContractual.id)
       }
 
-      const polizaExtra = await TblPolizas.query().preload('responsabilidad')
+      const polizaExtra = await TblPolizas.query().preload('responsabilidades')
       .where("pol_modalidad_id", modalidadId)
       .where("pol_vigilado_id", vigiladoId)
       .where("pol_tipo_poliza_id", 2)
@@ -156,6 +156,7 @@ const polizaIds = new Array()
       console.log("No Existe");
       const polizaDB = new TblPolizas();
       polizaDB.establecerPolizaDb(poliza);
+      polizaDB.responsabilidad = poliza.tieneResponsabilidad??false
       polizaDB.vigiladoId = vigiladoId;
       polizaDB.tipoPolizaId = tipoPoliza;
       await polizaDB.save();
