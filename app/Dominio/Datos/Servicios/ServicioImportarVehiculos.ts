@@ -181,21 +181,9 @@ export class ServicioImportarVehiculos {
     } else {
       try {
         // Consultar si la placa existe en la tabla TblVehiculos
-        /* const vehiculoExistente = await TblVehiculos.query().where('veh_placa', placa.toUpperCase()).first(); */
-        /* const vehiculoExistente = await TblVehiculos.query()
-    .where('veh_placa', placa.toUpperCase())
-    .where('veh_poliza', '!=', poliza)
-    .first(); */
- /*    const vehiculoExistente = await TblVehiculos.query() */
-  /* .where('veh_placa', placa.toUpperCase())
-  .where('veh_poliza', '!=', poliza)
-  .whereExists(function () {
-    this.from('tbl_polizas')
-      .whereRaw('tbl_polizas.numero = tbl_vehiculos.veh_poliza');
-  })
-  .first(); */
+       
 
-  const vehiculoExistente = await Database.rawQuery(`
+  /* const vehiculoExistente = await Database.rawQuery(`
   SELECT v.*
   FROM tbl_vehiculos v
   WHERE v.veh_placa = '${placa.toUpperCase()}'
@@ -206,7 +194,17 @@ export class ServicioImportarVehiculos {
       WHERE p.pol_numero = v.veh_poliza
     )
   LIMIT 1
+`); */
+
+const vehiculoExistente = await Database.rawQuery(`
+  SELECT v.*
+  FROM tbl_vehiculos v
+  WHERE v.veh_placa = '${placa.toUpperCase()}' 
+  LIMIT 1
 `);
+
+console.log(vehiculoExistente.rows);
+
  
         if (vehiculoExistente && vehiculoExistente.rows && vehiculoExistente.rows.length > 0) {
           errores.push({
