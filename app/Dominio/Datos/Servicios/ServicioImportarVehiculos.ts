@@ -121,6 +121,7 @@ export class ServicioImportarVehiculos {
     
     colComment.eachCell(async (cell, rowNumber) => {
       if (rowNumber >= 2) {
+        
         const placa = hoja.getCell('A' + rowNumber).value!.toString().toUpperCase();
         const pasajeros = parseInt(hoja.getCell('B' + rowNumber).value!.toString())
         if (placa !== '') {
@@ -133,7 +134,7 @@ export class ServicioImportarVehiculos {
           }
           try {
            // await TblVehiculos.updateOrCreate({ placa: inputPlaca.placa }, inputPlaca)
-            await TblVehiculos.updateOrCreate({ poliza: inputPlaca.poliza }, inputPlaca)
+            await TblVehiculos.create(inputPlaca)
           } catch (error) {
             console.log(error);
             
