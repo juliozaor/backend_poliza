@@ -4,7 +4,7 @@ import axios from 'axios';
 import FormData from 'form-data';
 import Env from '@ioc:Adonis/Core/Env';
 
-export default class ControladorReporte {
+export default class ControladorArchivo {
 
 
   public async archivos ({ request, response }:HttpContextContract) {
