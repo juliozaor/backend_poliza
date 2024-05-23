@@ -121,6 +121,7 @@ export class ServicioImportarVehiculos {
     
     colComment.eachCell(async (cell, rowNumber) => {
       if (rowNumber >= 2) {
+        
         const placa = hoja.getCell('A' + rowNumber).value!.toString().toUpperCase();
         const pasajeros = parseInt(hoja.getCell('B' + rowNumber).value!.toString())
         if (placa !== '') {
@@ -132,7 +133,8 @@ export class ServicioImportarVehiculos {
             vigiladoId:id
           }
           try {
-            await TblVehiculos.updateOrCreate({ placa: inputPlaca.placa }, inputPlaca)
+           // await TblVehiculos.updateOrCreate({ placa: inputPlaca.placa }, inputPlaca)
+            await TblVehiculos.create(inputPlaca)
           } catch (error) {
             console.log(error);
             
@@ -196,24 +198,36 @@ export class ServicioImportarVehiculos {
   LIMIT 1
 `); */
 
-const vehiculoExistente = await Database.rawQuery(`
+/* const vehiculoExistente = await Database.rawQuery(`
   SELECT v.*
   FROM tbl_vehiculos v
   WHERE v.veh_placa = '${placa.toUpperCase()}' 
   LIMIT 1
 `);
+ */
+const vehiculoExistente = await Database
+.from('tbl_vehiculos')
+.where('veh_placa', placa.toUpperCase())
+.first();
 
-console.log(vehiculoExistente.rows);
+if(vehiculoExistente){
+  const polizaExistente = await Database
+      .from('tbl_polizas')
+      .where('pol_numero', vehiculoExistente.veh_poliza)
+      .first();
+
+      if (polizaExistente ) {
+        errores.push({
+          columna: 'A',
+          fila: i.toString(),
+          error: 'La placa ya existe en otra poliza.',
+          valor: placa
+        });
+      }
+}
+
 
  
-        if (vehiculoExistente && vehiculoExistente.rows && vehiculoExistente.rows.length > 0) {
-          errores.push({
-            columna: 'A',
-            fila: i.toString(),
-            error: 'La placa ya existe en otra poliza.',
-            valor: placa
-          });
-        }
       } catch (error) {
         console.error('Error al consultar la base de datos:', error);
       }
