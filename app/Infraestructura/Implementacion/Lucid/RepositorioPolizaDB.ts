@@ -276,17 +276,21 @@ const polizaIds = new Array()
 
 
       let query = Database.from("tbl_vehiculos as tv")
-      .select(
+    .select(
         "tu.usn_identificacion as nit",
         "tu.usn_nombre as razon_social",
         "ttp.tpo_descripcion as tipo",
         "tp.pol_numero as numero_poliza",
         "tv.veh_placa as placa",
         "tv.veh_pasajeros as pasajeros"
-      )
-      .innerJoin("tbl_polizas as tp", "tp.pol_numero", "tv.veh_poliza") // Agregar INNER JOIN con tbl_polizas
-      .leftJoin("tbl_tipos_polizas as ttp", "tp.pol_tipo_poliza_id", "ttp.tpo_id")
-      .leftJoin("tbl_usuarios as tu", "tp.pol_vigilado_id", "tu.usn_id");
+    )
+    .innerJoin("tbl_polizas as tp", (join) => {
+        join.on("tp.pol_numero", "tv.veh_poliza")
+           .andOn("tp.pol_tipo_poliza_id", "tv.veh_tipo_poliza");
+    })
+    .leftJoin("tbl_tipos_polizas as ttp", "tp.pol_tipo_poliza_id", "ttp.tpo_id")
+    .leftJoin("tbl_usuarios as tu", "tp.pol_vigilado_id", "tu.usn_id");
+
     
     if (vigiladoId === id) {
       query = query.where("tu.usn_id", vigiladoId);
