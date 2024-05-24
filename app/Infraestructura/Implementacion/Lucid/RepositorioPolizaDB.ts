@@ -118,7 +118,7 @@ const polizaIds = new Array()
     //Borrar las placas de este usuario que no tengan poliza
     await Database.rawQuery(
     `DELETE FROM tbl_vehiculos 
-    WHERE veh_vigilado_id = '1e8d93d8-fa5f-4c43-aa98-3c1735eaf8b2' 
+    WHERE veh_vigilado_id = '${ vigiladoId }' 
     AND veh_placa NOT IN (
         SELECT v.veh_placa
         FROM tbl_vehiculos v
@@ -141,26 +141,32 @@ const polizaIds = new Array()
     vigiladoId: string,
     tipoPoliza:number
   ) => {
-
-   // let polizaId
-
-    const polizaDBExiste = await TblPolizas.findBy('pol_numero', poliza.numero);
+    
+    //const polizaDBExiste = await TblPolizas.findBy('pol_numero', poliza.numero);
+    const polizaDBExiste = await TblPolizas.query().where('pol_numero', poliza.numero).andWhere('pol_tipo_poliza_id', tipoPoliza).first();
         
-    if (polizaDBExiste) {      
-      /* polizaDBExiste.establecePolizaConId(poliza);
-      await polizaDBExiste.save(); */
-      //polizaId = polizaDBExiste.id;
+    if (polizaDBExiste) {  
       throw new Errores(`La poliza'${poliza.numero}', ya existe`, 400);
       
-    }else{
-      console.log("No Existe");
+    }
+    
+    const tipo = (tipoPoliza ==1)?2:1;
+    const polizaExisteUsuario = await TblPolizas.query().where('pol_numero', poliza.numero).andWhere('pol_tipo_poliza_id', tipo)
+    .andWhere('pol_vigilado_id','<>', vigiladoId).first();
+    if (polizaExisteUsuario) {  
+      throw new Errores(`La poliza'${poliza.numero}', ya existe`, 400);
+      
+    }
+    
+
+
       const polizaDB = new TblPolizas();
       polizaDB.establecerPolizaDb(poliza);
       polizaDB.responsabilidad = poliza.tieneResponsabilidad??false
       polizaDB.vigiladoId = vigiladoId;
       polizaDB.tipoPolizaId = tipoPoliza;
       await polizaDB.save();
-    }
+      
     const amparosIn = new Array();
     poliza.amparos.forEach((amparo) => {
       amparo.poliza = poliza.numero;
@@ -270,17 +276,21 @@ const polizaIds = new Array()
 
 
       let query = Database.from("tbl_vehiculos as tv")
-      .select(
+    .select(
         "tu.usn_identificacion as nit",
         "tu.usn_nombre as razon_social",
         "ttp.tpo_descripcion as tipo",
         "tp.pol_numero as numero_poliza",
         "tv.veh_placa as placa",
         "tv.veh_pasajeros as pasajeros"
-      )
-      .innerJoin("tbl_polizas as tp", "tp.pol_numero", "tv.veh_poliza") // Agregar INNER JOIN con tbl_polizas
-      .leftJoin("tbl_tipos_polizas as ttp", "tp.pol_tipo_poliza_id", "ttp.tpo_id")
-      .leftJoin("tbl_usuarios as tu", "tp.pol_vigilado_id", "tu.usn_id");
+    )
+    .innerJoin("tbl_polizas as tp", (join) => {
+        join.on("tp.pol_numero", "tv.veh_poliza")
+           .andOn("tp.pol_tipo_poliza_id", "tv.veh_tipo_poliza");
+    })
+    .leftJoin("tbl_tipos_polizas as ttp", "tp.pol_tipo_poliza_id", "ttp.tpo_id")
+    .leftJoin("tbl_usuarios as tu", "tp.pol_vigilado_id", "tu.usn_id");
+
     
     if (vigiladoId === id) {
       query = query.where("tu.usn_id", vigiladoId);
