@@ -45,15 +45,15 @@ if (!nombreArchivoLimpio.toLowerCase().endsWith(".xlsx")) {
   });
 }
 
-    const { poliza } = request.all();
+    const { poliza, tipo } = request.all();
     
-    if (!poliza) {
-      return response.status(400).send({ mensaje: "La póliza es requerida" });
+    if (!poliza || !tipo) {
+      return response.status(400).send({ mensaje: "La póliza y el tipo son requeridos" });
     }
     const { id } = await request.obtenerPayloadJWT();
     try {
       const respuesta = await this.servicioImportacionVehiculos.importDataXLSX(
-        archivo, poliza, id
+        archivo, poliza, id, tipo
       );
     
       return response.status(respuesta.estado).send(respuesta.datos ?? { mensaje: respuesta.mensaje });

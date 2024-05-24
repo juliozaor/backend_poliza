@@ -4,5 +4,6 @@ export class Vehiculo {
   pasajeros: number
   poliza: number  
   vigiladoId: string  
+  tipoPoliza?: number  
 }
 

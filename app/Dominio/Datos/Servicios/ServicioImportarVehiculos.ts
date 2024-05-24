@@ -16,7 +16,8 @@ export class ServicioImportarVehiculos {
   async importDataXLSX(
     archivo: MultipartFileContract,
     poliza: number,
-    id:string
+    id:string,
+    tipo:number
   ): Promise<Resultado<RespuestaImportacionExcel>> {
     let rutaArchivo;
     try {
@@ -56,7 +57,7 @@ export class ServicioImportarVehiculos {
 
       
       // Resto de la lógica del servicio...
-      let resultado = await this.importVehiculos(filePath, poliza, id)
+      let resultado = await this.importVehiculos(filePath, poliza, id, tipo)
       return resultado
     } catch (error) {
       console.error(error);
@@ -78,7 +79,7 @@ export class ServicioImportarVehiculos {
     }
   }
 
-  async importVehiculos(filelocation, poliza: number, id:string): Promise<Resultado<RespuestaImportacionExcel>> {
+  async importVehiculos(filelocation, poliza: number, id:string, tipo:number): Promise<Resultado<RespuestaImportacionExcel>> {
     let resultado: Resultado<ErrorFormatoImportarExcel[]>
     let libro = new Excel.Workbook()
     libro = await libro.xlsx.readFile(filelocation)
@@ -95,7 +96,7 @@ export class ServicioImportarVehiculos {
    
     
     
-      return this.import(colComment, hoja, poliza, id);
+      return this.import(colComment, hoja, poliza, id, tipo);
     
     /* return new Resultado({
       estado: 500,
@@ -103,7 +104,7 @@ export class ServicioImportarVehiculos {
     }) */
   }
 
-  async import(colComment: Excel.Column,hoja: Excel.Worksheet, poliza:number, id:string): Promise<Resultado<RespuestaImportacionExcel>> {
+  async import(colComment: Excel.Column,hoja: Excel.Worksheet, poliza:number, id:string, tipoPoliza:number): Promise<Resultado<RespuestaImportacionExcel>> {
     
     const errores = await this.validarVehiculos(hoja, poliza)
     
@@ -117,7 +118,7 @@ export class ServicioImportarVehiculos {
       })
     }
 
-    await TblVehiculos.query().where('veh_poliza',poliza).delete();
+    await TblVehiculos.query().where('veh_poliza',poliza).andWhere('veh_tipo_poliza',tipoPoliza).delete();
     
     colComment.eachCell(async (cell, rowNumber) => {
       if (rowNumber >= 2) {
@@ -130,7 +131,8 @@ export class ServicioImportarVehiculos {
             placa,
             pasajeros,
             poliza,
-            vigiladoId:id
+            vigiladoId:id,
+            tipoPoliza
           }
           try {
            // await TblVehiculos.updateOrCreate({ placa: inputPlaca.placa }, inputPlaca)

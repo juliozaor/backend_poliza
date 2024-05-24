@@ -9,6 +9,7 @@ export default class TblVehiculos extends BaseModel {
   @column({ columnName: 'veh_pasajeros' }) public pasajeros: number
   @column({ columnName: 'veh_poliza' }) public poliza: number  
   @column({ columnName: 'veh_vigilado_id' }) public vigiladoId: string  
+  @column({ columnName: 'veh_tipo_poliza' }) public tipoPoliza?: number  
  
   @column.dateTime({ autoCreate: true , columnName: 'veh_creado'}) public createdAt: DateTime
   @column.dateTime({ autoCreate: true, autoUpdate: true, columnName: 'veh_actualizado' }) public updatedAt: DateTime 
@@ -20,6 +21,7 @@ export default class TblVehiculos extends BaseModel {
     this.pasajeros = vehiculo.pasajeros
     this.poliza = vehiculo.poliza
     this.vigiladoId = vehiculo.vigiladoId
+    this.tipoPoliza = this.tipoPoliza
   }
 
   public estableceVehiculoConId (vehiculo: Vehiculo) {
@@ -27,6 +29,7 @@ export default class TblVehiculos extends BaseModel {
     this.pasajeros = vehiculo.pasajeros
     this.poliza = vehiculo.poliza
     this.vigiladoId = vehiculo.vigiladoId
+    this.tipoPoliza = this.tipoPoliza
   }
 
   public obtenerVehiculo (): Vehiculo {
@@ -36,6 +39,7 @@ export default class TblVehiculos extends BaseModel {
     vehiculo.pasajeros = this.pasajeros
     vehiculo.poliza = this.poliza
     vehiculo.vigiladoId = this.vigiladoId
+    vehiculo.tipoPoliza = this.tipoPoliza
     return vehiculo
   }
 
