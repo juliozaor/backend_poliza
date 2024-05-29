@@ -15,6 +15,7 @@ import { ServicioEstados } from "App/Dominio/Datos/Servicios/ServicioEstados";
 
 export class RepositorioPolizaDB implements RepositorioPoliza {
   private servicioEstados = new ServicioEstados();
+
   async visualizar(modalidadId: number, vigiladoId: string): Promise<any> {
    /*  let editable = true;
 
@@ -114,18 +115,25 @@ const polizaIds = new Array()
       await this.guardarPoliza(polizaContractual, vigiladoId,1);
       if(polizaExtracontractual){
       await this.guardarPoliza(polizaExtracontractual, vigiladoId,2)
+      
     }
+    this.servicioEstados.Log(vigiladoId,3)
     //Borrar las placas de este usuario que no tengan poliza
-    await Database.rawQuery(
-    `DELETE FROM tbl_vehiculos 
-    WHERE veh_vigilado_id = '${ vigiladoId }' 
-    AND veh_placa NOT IN (
-        SELECT v.veh_placa
-        FROM tbl_vehiculos v
-        LEFT JOIN tbl_polizas  p ON v.veh_poliza = p.pol_numero
-        WHERE p.pol_numero IS NOT null
-    )`
-  )
+    try {
+      await Database.rawQuery(
+      `DELETE FROM tbl_vehiculos 
+      WHERE veh_vigilado_id = '${ vigiladoId }' 
+      AND veh_placa NOT IN (
+          SELECT v.veh_placa
+          FROM tbl_vehiculos v
+          LEFT JOIN tbl_polizas  p ON v.veh_poliza = p.pol_numero
+          WHERE p.pol_numero IS NOT null
+      )`
+    )      
+    } catch (error) {
+      console.log('no se encontarron placas a eliminar');
+      
+    }
 
 
       return {
@@ -249,6 +257,7 @@ const polizaIds = new Array()
   };
 
   async capacidad(datos: any, vigiladoId: string): Promise<any> {  
+    
     const { capacidades }= datos 
     capacidades.map(capacidad =>{
       capacidad.vigiladoId = vigiladoId
@@ -258,6 +267,7 @@ const polizaIds = new Array()
     try {
       await TblCapacidades.updateOrCreateMany(['modalidadId','numero'],capacidades);
       this.servicioEstados.EnviadosSt(vigiladoId,1)
+      this.servicioEstados.Log(vigiladoId,1)
       return {
         mensaje: "Modalidades guardadas correctamente",
       };
