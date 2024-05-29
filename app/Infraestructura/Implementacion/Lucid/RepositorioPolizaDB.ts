@@ -119,16 +119,21 @@ const polizaIds = new Array()
     }
     this.servicioEstados.Log(vigiladoId,3)
     //Borrar las placas de este usuario que no tengan poliza
-    await Database.rawQuery(
-    `DELETE FROM tbl_vehiculos 
-    WHERE veh_vigilado_id = '${ vigiladoId }' 
-    AND veh_placa NOT IN (
-        SELECT v.veh_placa
-        FROM tbl_vehiculos v
-        LEFT JOIN tbl_polizas  p ON v.veh_poliza = p.pol_numero
-        WHERE p.pol_numero IS NOT null
-    )`
-  )
+    try {
+      await Database.rawQuery(
+      `DELETE FROM tbl_vehiculos 
+      WHERE veh_vigilado_id = '${ vigiladoId }' 
+      AND veh_placa NOT IN (
+          SELECT v.veh_placa
+          FROM tbl_vehiculos v
+          LEFT JOIN tbl_polizas  p ON v.veh_poliza = p.pol_numero
+          WHERE p.pol_numero IS NOT null
+      )`
+    )      
+    } catch (error) {
+      console.log('no se encontarron placas a eliminar');
+      
+    }
 
 
       return {

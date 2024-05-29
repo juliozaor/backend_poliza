@@ -25,15 +25,26 @@ export class ServicioEstados {
   }
 
   public async Log(vigiladoId: string, estadoId: number) {
+    console.log("entro: ",vigiladoId, estadoId);
+    
     const existe = await TblLogEstados.query().where(
      {'tle_vigilado_id': vigiladoId, 'tle_estado_id': estadoId}).first()
+     console.log({existe});
+     
        if (!existe) {
-         const logEstados = new TblLogEstados()
-         logEstados.vigiladoId = vigiladoId
-         logEstados.estadoId = estadoId
-         await logEstados.save()
- 
-         this.estadoReporte(vigiladoId,estadoId) 
+        console.log('no extite');
+        try {
+          
+          const logEstados = new TblLogEstados()
+          logEstados.vigiladoId = vigiladoId
+          logEstados.estadoId = estadoId
+          await logEstados.save()
+  
+          this.estadoReporte(vigiladoId,estadoId) 
+        } catch (error) {
+          console.log(error);
+          
+        }
  
        }      
  
