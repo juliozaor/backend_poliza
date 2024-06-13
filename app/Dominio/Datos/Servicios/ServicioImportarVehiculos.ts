@@ -183,7 +183,7 @@ export class ServicioImportarVehiculos {
         valor: placa
       });
     } else {
-      try {
+      //try {
         // Consultar si la placa existe en la tabla TblVehiculos
        
 
@@ -207,7 +207,7 @@ export class ServicioImportarVehiculos {
   LIMIT 1
 `);
  */
-const vehiculoExistente = await Database
+/* const vehiculoExistente = await Database
 .from('tbl_vehiculos')
 .where('veh_placa', placa.toUpperCase())
 .first();
@@ -232,7 +232,7 @@ if(vehiculoExistente){
  
       } catch (error) {
         console.error('Error al consultar la base de datos:', error);
-      }
+      } */
     }
 
     // Validar existencia de pasajeros
