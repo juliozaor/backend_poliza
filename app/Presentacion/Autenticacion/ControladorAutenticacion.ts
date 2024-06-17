@@ -5,6 +5,8 @@ import { EncriptadorAdonis } from 'App/Infraestructura/Encriptacion/EncriptadorA
 import { RepositorioAutorizacionDB } from 'App/Infraestructura/Implementacion/Lucid/RepositorioAutorizacionDB'
 import { RepositorioBloqueoUsuarioDB } from 'App/Infraestructura/Implementacion/Lucid/RepositorioBloqueoUsuarioDB'
 import { RepositorioUsuariosDB } from 'App/Infraestructura/Implementacion/Lucid/RepositorioUsuariosDB'
+import axios from 'axios'
+import Env from '@ioc:Adonis/Core/Env';
 
 export default class ControladorArchivoVariable {
   private service: ServicioAutenticacion
@@ -24,6 +26,31 @@ export default class ControladorArchivoVariable {
     const contrasena = peticion['contrasena']
     const datos = await this.service.iniciarSesion(usuario, contrasena)
     return datos
+  }
+
+  public async inicioVigia ({ request, response }:HttpContextContract) {
+    const peticion = request.all()
+    const token = peticion['token']
+
+    const respuesta = await axios.post(`${Env.get('URL_VIGIA')}/autenticacion/token/verificar`, {token}).then(resp =>{
+      return resp.data      
+    }).catch(err =>{
+      if(err.response?.data){
+        return err.response.data
+      }else{
+        return `Fallo el inicio de sesión - consulte con el administrador`
+
+      }     
+      
+    })
+
+    if( respuesta.datos){
+      const datos = await this.service.iniciarSesion(respuesta.datos.documento, respuesta.datos.documento)
+    return datos
+    }
+
+    return respuesta
+
   }
 
   public async cambiarClave({request, response}:HttpContextContract){
