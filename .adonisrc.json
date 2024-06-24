@@ -32,6 +32,7 @@
     "./start/Rutas/ruta_aseguradora",
     "./start/Rutas/ruta_soportes",
     "./start/Rutas/ruta_estados",
+    "./start/Rutas/ruta_informes",
     "./start/Rutas/ruta_usuario"
   ],
   "providers": [
