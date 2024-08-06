@@ -6,6 +6,8 @@ import TblResponsabilidades from './responsabilidades';
 import TblVehiculos from './Vehiculos';
 import TblTiposPolizas from './TiposPoliza';
 import TblUsuarios from './Usuario';
+import TblDetallesPolizaCoberturas from './DetallespolizaCobertura';
+import TblArchivo from './Archivos';
 
 export default class TblPolizas extends BaseModel {
   @column({ isPrimary: true, columnName: 'pol_id' })  public id?: number  
@@ -68,7 +70,7 @@ export default class TblPolizas extends BaseModel {
 
   @hasOne(() => TblResponsabilidades, {
     localKey: 'numero',
-    foreignKey: 'polizaId',
+    foreignKey: 'poliza',
   })
   public responsabilidades: HasOne<typeof TblResponsabilidades>
 
@@ -90,5 +92,17 @@ export default class TblPolizas extends BaseModel {
   })
   public vigilado: BelongsTo<typeof TblUsuarios>
 
+
+  @hasMany(()=>TblDetallesPolizaCoberturas, {
+    localKey: 'numero',
+    foreignKey: 'poliza'
+  })
+  public covertura: HasMany<typeof TblDetallesPolizaCoberturas>
+
+  @hasMany(()=>TblArchivo, {
+    localKey: 'numero',
+    foreignKey: 'poliza'
+  })
+  public archivo: HasMany<typeof TblArchivo>
 
 }

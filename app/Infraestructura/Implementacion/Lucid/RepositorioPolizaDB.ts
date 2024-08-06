@@ -1,4 +1,3 @@
-
 import { RepositorioPoliza } from "App/Dominio/Repositorios/RepositorioPoliza";
 /* import TblTiposPolizas from "App/Infraestructura/Datos/Entidad/TiposPoliza"; */
 import TblPolizas from "App/Infraestructura/Datos/Entidad/poliza";
@@ -12,199 +11,155 @@ import Database from "@ioc:Adonis/Lucid/Database";
 import { MapeadorPaginacionDB } from "./MapeadorPaginacionDB";
 import Errores from "App/Exceptions/Errores";
 import { ServicioEstados } from "App/Dominio/Datos/Servicios/ServicioEstados";
+import TblVehiculos from "App/Infraestructura/Datos/Entidad/Vehiculos";
 
 export class RepositorioPolizaDB implements RepositorioPoliza {
   private servicioEstados = new ServicioEstados();
 
-  async visualizar(modalidadId: number, vigiladoId: string): Promise<any> {
-   /*  let editable = true;
+  async visualizar(params: any, vigiladoId: string): Promise<any> {
+    const { poliza, tipoPoliza } = params;
+    let polizaR: any;
+    const polizaDb = await TblPolizas.query()
+      .preload("covertura")
+      .preload("responsabilidades")
+      .preload("archivo")
+      .where({ pol_numero: poliza, pol_tipo_poliza_id: tipoPoliza })
+      .first();
 
-const polizaIds = new Array()     
-
-    const polizaContractual = await TblPolizas.query().preload('responsabilidades')
-      .where("pol_modalidad_id", modalidadId)
-      .where("pol_vigilado_id", vigiladoId)
-      .where("pol_tipo_poliza_id", 1)
-      .where("pol_fin_vigencia", ">=", new Date())
-      .orderBy("pol_fin_vigencia", "desc")  
-      .first()
-
-      
-      
-
-      if(polizaContractual){
-        polizaIds.push(polizaContractual.id)
-      }
-
-      const polizaExtra = await TblPolizas.query().preload('responsabilidades')
-      .where("pol_modalidad_id", modalidadId)
-      .where("pol_vigilado_id", vigiladoId)
-      .where("pol_tipo_poliza_id", 2)
-      .where("pol_fin_vigencia", ">=", new Date())
-      .orderBy("pol_fin_vigencia", "desc")  
-      .first()
-
-      if(polizaExtra){
-        polizaIds.push(polizaExtra.id)
-      }
-
-
-    const consulta = TblTiposPolizas.query().preload(
-      "coberturas",
-      async (sqlCob) => {
-        sqlCob.preload("tiposAmparo");
-        sqlCob.orderBy("orden", "asc");
-        if (polizaIds.length > 0) {
-          sqlCob.preload("detalles", (sqlDetalle) => {
-            sqlDetalle.whereIn("dpl_poliza_id", polizaIds);
-          });
-          editable = false;          
-        }
-      }
-    );
-
-    let tiposPoliza = await consulta;
-
-    const coberturasPorTipoAmparoYPoliza = tiposPoliza.reduce(
-      (acumulador, poliza) => {
-        poliza.coberturas.forEach((cobertura) => {
-          const tipoAmparo = cobertura.tiposAmparo.nombre;
-          const tipoPoliza = poliza.descripcion;
-
-          // Si el tipo de amparo aún no existe en el objeto, inicializarlo como un objeto vacío
-          if (!acumulador[tipoPoliza]) {
-            acumulador[tipoPoliza] = {};
-          }
-
-          // Si el tipo de póliza aún no existe en el objeto de amparo, inicializarlo como un array vacío
-          if (!acumulador[tipoPoliza][tipoAmparo]) {
-            acumulador[tipoPoliza][tipoAmparo] = [];
-          }
-
-          // Agregar la cobertura al array correspondiente al tipo de amparo y tipo de póliza
-          acumulador[tipoPoliza][tipoAmparo].push(cobertura);
-        });
-
-        return acumulador;
-      },
-      {}
-    );
-
-    
-    if(polizaContractual){
-      coberturasPorTipoAmparoYPoliza["polizaContractual"] = polizaContractual;
+    if (polizaDb) {
+      polizaR = {
+        numero: polizaDb.numero,
+        aseguradoraId: polizaDb.aseguradoraId,
+        inicioVigencia: polizaDb.inicioVigencia,
+        finVigencia: polizaDb.finVigencia,
+        amparos: polizaDb.covertura?.map((covertura) => {
+          return {
+            coberturaId: covertura.coberturaId,
+            valorAsegurado: covertura.valorAsegurado,
+            limite: covertura.limite,
+            deducible: covertura.deducible,
+          };
+        }),
+        responsabilidad: polizaDb.responsabilidad,
+        responsabilidades: polizaDb.responsabilidades
+          ? {
+              fechaConstitucion: polizaDb.responsabilidades.fechaConstitucion,
+              resolucion: polizaDb.responsabilidades.resolucion,
+              fechaResolucion: polizaDb.responsabilidades.fechaResolucion,
+              valorReserva: polizaDb.responsabilidades.valorReserva,
+              fechaReserva: polizaDb.responsabilidades.fechaReserva,
+              informacion: polizaDb.responsabilidades.informacion,
+              operacion: polizaDb.responsabilidades.operacion,
+              valorCumplimiento_uno:
+                polizaDb.responsabilidades.valorCumplimientoUno,
+              valorCumplimiento_dos:
+                polizaDb.responsabilidades.valorCumplimientoDos,
+            }
+          : null,
+        archivo: polizaDb.archivo[0]
+          ? {
+              nombre: polizaDb.archivo[0].nombre,
+              nombreOriginal: polizaDb.archivo[0].nombreOriginal,
+              ruta: polizaDb.archivo[0].ruta,
+            }
+          : null,
+      };
     }
-    
-    if(polizaExtra){
-      coberturasPorTipoAmparoYPoliza["polizaExtracontractual"] = polizaExtra;
-    }
-    
-    
-    coberturasPorTipoAmparoYPoliza["editable"] = editable;
-    return coberturasPorTipoAmparoYPoliza; */
+
+    return polizaR;
   }
 
   async guardar(datos: any, vigiladoId: string): Promise<any> {
-    const {
-      polizaContractual,
-      polizaExtracontractual,      
-    } = datos;
+    const { polizaContractual, polizaExtracontractual } = datos;
 
-    
     try {
-      await this.guardarPoliza(polizaContractual, vigiladoId,1);
-      if(polizaExtracontractual){
-      await this.guardarPoliza(polizaExtracontractual, vigiladoId,2)
-      
-    }
-    this.servicioEstados.Log(vigiladoId,3)
-    //Borrar las placas de este usuario que no tengan poliza
-    try {
-      await Database.rawQuery(
-      `DELETE FROM tbl_vehiculos 
-      WHERE veh_vigilado_id = '${ vigiladoId }' 
+      await this.guardarPoliza(polizaContractual, vigiladoId, 1);
+      if (polizaExtracontractual) {
+        await this.guardarPoliza(polizaExtracontractual, vigiladoId, 2);
+      }
+      this.servicioEstados.Log(vigiladoId, 3);
+      //Borrar las placas de este usuario que no tengan poliza
+      try {
+        await Database.rawQuery(
+          `DELETE FROM tbl_vehiculos 
+      WHERE veh_vigilado_id = '${vigiladoId}' 
       AND veh_placa NOT IN (
           SELECT v.veh_placa
           FROM tbl_vehiculos v
           LEFT JOIN tbl_polizas  p ON v.veh_poliza = p.pol_numero
           WHERE p.pol_numero IS NOT null
       )`
-    )      
-    } catch (error) {
-      console.log('no se encontarron placas a eliminar');
-      
-    }
-
+        );
+      } catch (error) {
+        console.log("no se encontarron placas a eliminar");
+      }
 
       return {
         mensaje: "Polizas guardada correctamente",
       };
-    } catch (error) {      
-      throw error;      
+    } catch (error) {
+      throw error;
     }
   }
 
   guardarPoliza = async (
     poliza: any,
     vigiladoId: string,
-    tipoPoliza:number
+    tipoPoliza: number
   ) => {
-    
     //const polizaDBExiste = await TblPolizas.findBy('pol_numero', poliza.numero);
-    const polizaDBExiste = await TblPolizas.query().where('pol_numero', poliza.numero).andWhere('pol_tipo_poliza_id', tipoPoliza).first();
-        
-    if (polizaDBExiste) {  
-      throw new Errores(`La poliza'${poliza.numero}', ya existe`, 400);
-      
-    }
-    
-    const tipo = (tipoPoliza ==1)?2:1;
-    const polizaExisteUsuario = await TblPolizas.query().where('pol_numero', poliza.numero).andWhere('pol_tipo_poliza_id', tipo)
-    .andWhere('pol_vigilado_id','<>', vigiladoId).first();
-    if (polizaExisteUsuario) {  
-      throw new Errores(`La poliza'${poliza.numero}', ya existe`, 400);
-      
-    }
-    
+    const polizaDBExiste = await TblPolizas.query()
+      .where("pol_numero", poliza.numero)
+      .andWhere("pol_tipo_poliza_id", tipoPoliza)
+      .first();
 
+    if (polizaDBExiste) {
+      throw new Errores(`La poliza'${poliza.numero}', ya existe`, 400);
+    }
 
-      const polizaDB = new TblPolizas();
-      polizaDB.establecerPolizaDb(poliza);
-      polizaDB.responsabilidad = poliza.tieneResponsabilidad??false
-      polizaDB.vigiladoId = vigiladoId;
-      polizaDB.tipoPolizaId = tipoPoliza;
-      await polizaDB.save();
-      
+    const tipo = tipoPoliza == 1 ? 2 : 1;
+    const polizaExisteUsuario = await TblPolizas.query()
+      .where("pol_numero", poliza.numero)
+      .andWhere("pol_tipo_poliza_id", tipo)
+      .andWhere("pol_vigilado_id", "<>", vigiladoId)
+      .first();
+    if (polizaExisteUsuario) {
+      throw new Errores(`La poliza'${poliza.numero}', ya existe`, 400);
+    }
+
+    const polizaDB = new TblPolizas();
+    polizaDB.establecerPolizaDb(poliza);
+    polizaDB.responsabilidad = poliza.tieneResponsabilidad ?? false;
+    polizaDB.vigiladoId = vigiladoId;
+    polizaDB.tipoPolizaId = tipoPoliza;
+    await polizaDB.save();
+
     const amparosIn = new Array();
     poliza.amparos.forEach((amparo) => {
       amparo.poliza = poliza.numero;
       amparosIn.push(amparo);
     });
-    
-    if(poliza.responsabilidad){
+
+    if (poliza.responsabilidad) {
       await this.guardarResponsabilidad(poliza.responsabilidad, poliza.numero);
     }
 
-    if(poliza.caratula){
+    if (poliza.caratula) {
       await this.guardarArchivo(poliza.caratula, poliza.numero);
     }
 
-
     try {
-      await TblDetallesPolizaCoberturas.updateOrCreateMany(['coberturaId','poliza'],amparosIn);
+      await TblDetallesPolizaCoberturas.updateOrCreateMany(
+        ["coberturaId", "poliza"],
+        amparosIn
+      );
       return {
         mensaje: "Poliza guardada correctamente",
       };
     } catch (error) {
       console.log(error);
-      
     }
-
-
   };
-
-
-
 
   guardarResponsabilidad = async (
     responsabilidad: Responsabilidad,
@@ -231,15 +186,9 @@ const polizaIds = new Array()
     }
   };
 
-  guardarArchivo = async (
-    archivo: Archivo,
-    poliza: number
-  ) => {
+  guardarArchivo = async (archivo: Archivo, poliza: number) => {
     try {
-      const archivoBDExiste = await TblArchivo.findBy(
-        "arc_poliza",
-        poliza
-      );
+      const archivoBDExiste = await TblArchivo.findBy("arc_poliza", poliza);
       if (archivoBDExiste) {
         archivoBDExiste.estableceArchivoConId(archivo);
         await archivoBDExiste.save();
@@ -256,74 +205,83 @@ const polizaIds = new Array()
     }
   };
 
-  async capacidad(datos: any, vigiladoId: string): Promise<any> {  
-    
-    const { capacidades }= datos 
-    capacidades.map(capacidad =>{
-      capacidad.vigiladoId = vigiladoId
-      return capacidad
-    })    
-    
+  async capacidad(datos: any, vigiladoId: string): Promise<any> {
+    const { capacidades } = datos;
+    capacidades.map((capacidad) => {
+      capacidad.vigiladoId = vigiladoId;
+      return capacidad;
+    });
+
     try {
-      await TblCapacidades.updateOrCreateMany(['modalidadId','numero'],capacidades);
-      this.servicioEstados.EnviadosSt(vigiladoId,1)
-      this.servicioEstados.Log(vigiladoId,1)
+      await TblCapacidades.updateOrCreateMany(
+        ["modalidadId", "numero"],
+        capacidades
+      );
+      this.servicioEstados.EnviadosSt(vigiladoId, 1);
+      this.servicioEstados.Log(vigiladoId, 1);
       return {
         mensaje: "Modalidades guardadas correctamente",
       };
     } catch (error) {
       console.log(error);
-      throw new Errores(`Se presento un problema al cargar las modalidades`, 400);
-      
+      throw new Errores(
+        `Se presento un problema al cargar las modalidades`,
+        400
+      );
     }
   }
 
-  async obtenerVehiculos(params: any, id:string): Promise<any> {  
-    const {pagina, limite, vigiladoId, termino } = params
-    
-      const placas= new Array();
+  async obtenerVehiculos(params: any, id: string): Promise<any> {
+    const { pagina, limite, vigiladoId, termino } = params;
 
+    const placas = new Array();
 
-
-      let query = Database.from("tbl_vehiculos as tv")
-    .select(
+    let query = Database.from("tbl_vehiculos as tv")
+      .select(
         "tu.usn_identificacion as nit",
         "tu.usn_nombre as razon_social",
         "ttp.tpo_descripcion as tipo",
         "tp.pol_numero as numero_poliza",
         "tv.veh_placa as placa",
         "tv.veh_pasajeros as pasajeros"
-    )
-    .innerJoin("tbl_polizas as tp", (join) => {
-        join.on("tp.pol_numero", "tv.veh_poliza")
-           .andOn("tp.pol_tipo_poliza_id", "tv.veh_tipo_poliza");
-    })
-    .leftJoin("tbl_tipos_polizas as ttp", "tp.pol_tipo_poliza_id", "ttp.tpo_id")
-    .leftJoin("tbl_usuarios as tu", "tp.pol_vigilado_id", "tu.usn_id");
+      )
+      .innerJoin("tbl_polizas as tp", (join) => {
+        join
+          .on("tp.pol_numero", "tv.veh_poliza")
+          .andOn("tp.pol_tipo_poliza_id", "tv.veh_tipo_poliza");
+      })
+      .leftJoin(
+        "tbl_tipos_polizas as ttp",
+        "tp.pol_tipo_poliza_id",
+        "ttp.tpo_id"
+      )
+      .leftJoin("tbl_usuarios as tu", "tp.pol_vigilado_id", "tu.usn_id");
 
-    
     if (vigiladoId === id) {
       query = query.where("tu.usn_id", vigiladoId);
     }
-    
+
     if (termino) {
-      query.andWhere(subquery => {
-        subquery.orWhereRaw("LOWER(tu.usn_identificacion) LIKE LOWER(?)", [`%${termino}%`])
-        subquery.orWhereRaw("LOWER(tu.usn_nombre) LIKE LOWER(?)", [`%${termino}%`])
-        subquery.orWhereRaw("LOWER(ttp.tpo_descripcion) LIKE LOWER(?)", [`%${termino}%`])
-        subquery.orWhereRaw("LOWER(tv.veh_placa) LIKE LOWER(?)", [`%${termino}%`])
-        .orWhereRaw("LOWER(CAST(tp.pol_numero AS TEXT)) LIKE LOWER(?)", [`%${termino}%`]);
-  
-      })
+      query.andWhere((subquery) => {
+        subquery.orWhereRaw("LOWER(tu.usn_identificacion) LIKE LOWER(?)", [
+          `%${termino}%`,
+        ]);
+        subquery.orWhereRaw("LOWER(tu.usn_nombre) LIKE LOWER(?)", [
+          `%${termino}%`,
+        ]);
+        subquery.orWhereRaw("LOWER(ttp.tpo_descripcion) LIKE LOWER(?)", [
+          `%${termino}%`,
+        ]);
+        subquery
+          .orWhereRaw("LOWER(tv.veh_placa) LIKE LOWER(?)", [`%${termino}%`])
+          .orWhereRaw("LOWER(CAST(tp.pol_numero AS TEXT)) LIKE LOWER(?)", [
+            `%${termino}%`,
+          ]);
+      });
     }
     console.log(pagina, limite);
-    
-    
+
     const datos = await query.paginate(pagina, limite);
-  
-
-
-
 
     datos.forEach((dato) => {
       placas.push({
@@ -332,7 +290,7 @@ const polizaIds = new Array()
         tipo: dato.tipo,
         numero_poliza: dato.numero_poliza,
         placa: dato.placa,
-        pasajeros: dato.pasajeros
+        pasajeros: dato.pasajeros,
       });
     });
 
@@ -340,13 +298,131 @@ const polizaIds = new Array()
       ...datos,
       serialize() {
         return datos.toJSON();
-      }
+      },
     };
-    
-    const paginacion = MapeadorPaginacionDB.obtenerPaginacion(datosSerializados);
+
+    const paginacion =
+      MapeadorPaginacionDB.obtenerPaginacion(datosSerializados);
 
     return { placas, paginacion };
+  }
 
+  async listarPolizas(params: any, id: string): Promise<any> {
+    const { pagina, limite, poliza, tipoPoliza, fechaInicio, fechaFin } =
+      params;
+
+    const polizas = new Array();
+
+    let query = TblPolizas.query()
+      .preload("tipoPoliza")
+      .where("pol_vigilado_id", id);
+
+    if (poliza) {
+      query.andWhere("pol_numero", poliza);
+    }
+
+    if (tipoPoliza) {
+      query.andWhere("pol_tipo_poliza_id", tipoPoliza);
+    }
+
+    if (fechaInicio) {
+      query.andWhere("pol_inicio_vigencia", fechaInicio);
+    }
+
+    if (fechaFin) {
+      query.andWhere("pol_fin_vigencia", fechaFin);
+    }
+
+    const datos = await query.paginate(pagina, limite);
+
+    datos.forEach((dato) => {
+      polizas.push({
+        poliza: dato.numero,
+        tipoPoliza: dato.tipoPoliza.descripcion,
+        fechaInicio: dato.inicioVigencia,
+        fechaFin: dato.finVigencia,
+      });
+    });
+
+    const paginacion = MapeadorPaginacionDB.obtenerPaginacion(datos);
+
+    return { polizas, paginacion };
+  }
+
+    async listarVehiculos(params: any, id:string): Promise<any> {  
+    const {pagina, limite, poliza, tipoPoliza, placa } = params
+    
+      const vehiculos= new Array();
+
+    let query = TblVehiculos.query().where({'veh_poliza': poliza, 'veh_tipo_poliza':tipoPoliza})
+ 
+    if (placa) {
+      query.andWhere('veh_placa',placa)
+    }
+
+     
+    
+    const datos = await query.paginate(pagina, limite);
+
+    datos.forEach((dato) => {
+      vehiculos.push({
+        placa: dato.placa,
+        pasajeros: dato.pasajeros
+      });
+    });
+    
+    const paginacion = MapeadorPaginacionDB.obtenerPaginacion(datos);
+
+    return { vehiculos, paginacion };
+
+  }
+
+  async agregarVehiculos(params: any, id:string): Promise<any> {  
+    const {poliza, tipoPoliza, placa, pasajeros } = params
+
+    const existe = await TblVehiculos.query().where({'veh_placa':placa, 'veh_poliza': poliza, 'veh_tipo_poliza':tipoPoliza}).first()
+    if(existe){
+      return { mensaje: 'El vehiculo ya existe' }
+    }
+    
+    const vehiculo = new TblVehiculos();
+    vehiculo.poliza = poliza;
+    vehiculo.tipoPoliza = tipoPoliza;
+    vehiculo.placa = placa;
+    vehiculo.pasajeros = pasajeros;
+    await vehiculo.save()
+
+    return { mensaje: 'Vehiculo agregado con exito' }    
+
+      
+
+  }
+
+  async eliminarVehiculos(params: any, id:string): Promise<any> {  
+    const { poliza, tipoPoliza, placas } = params;
+
+    if (!placas || placas.length === 0) {
+      return { mensaje: 'No se proporcionaron placas para eliminar' };
+    }
+  
+    // Buscar los vehículos que coinciden con las placas, poliza y tipoPoliza
+    const vehiculosExistentes = await TblVehiculos.query()
+      .whereIn('veh_placa', placas)
+      .andWhere('veh_poliza', poliza)
+      .andWhere('veh_tipo_poliza', tipoPoliza);
+  
+    if (vehiculosExistentes.length === 0) {
+      return { mensaje: 'No se encontraron vehículos para eliminar' };
+    }
+  
+    // Eliminar los vehículos encontrados
+    await TblVehiculos.query()
+      .whereIn('veh_placa', placas)
+      .andWhere('veh_poliza', poliza)
+      .andWhere('veh_tipo_poliza', tipoPoliza)
+      .delete();
+  
+    return { mensaje: 'Vehículos fueron eliminados con éxito' }; 
   }
 
 }
