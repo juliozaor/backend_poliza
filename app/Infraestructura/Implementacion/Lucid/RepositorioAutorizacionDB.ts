@@ -3,7 +3,7 @@ import { Rol } from "App/Dominio/Datos/Entidades/Autorizacion/Rol";
 import { RepositorioAutorizacion } from "App/Dominio/Repositorios/RepositorioAutorizacion";
 import TblModulos from "App/Infraestructura/Datos/Entidad/Autorizacion/Modulo";
 import TblRoles from "App/Infraestructura/Datos/Entidad/Autorizacion/Rol";
-//import TblSubmodulos from "App/Infraestructura/Datos/Entidad/Autorizacion/Submodulo";
+import TblSubmodulos from "App/Infraestructura/Datos/Entidad/Autorizacion/Submodulo";
 
 export class RepositorioAutorizacionDB implements RepositorioAutorizacion {
     private readonly TABLA_ROLES = 'tbl_roles'
@@ -14,10 +14,12 @@ export class RepositorioAutorizacionDB implements RepositorioAutorizacion {
     async obtenerRolConModulosYPermisos(idRol: string): Promise<Rol> {
         const rol = (await TblRoles.findOrFail(idRol)).obtenerRol()
         let modulos = await this.obtenerModulosDeUnRol(idRol)
-        //modulos = await this.obtenerFuncionalidadesModulos(modulos)
+        modulos = await this.obtenerFuncionalidadesModulos(modulos)
         modulos.forEach(modulo => {
             rol.agregarModulo(modulo)
         })
+        
+        
         return rol
     }
 
@@ -32,7 +34,7 @@ export class RepositorioAutorizacionDB implements RepositorioAutorizacion {
         })
     }
 
- /*    private async obtenerFuncionalidadesModulos(modulos: Modulo[]): Promise<Modulo[]> {
+    private async obtenerFuncionalidadesModulos(modulos: Modulo[]): Promise<Modulo[]> {
         const submodulosDb = await TblSubmodulos.query()
             .whereIn('smod_modulo', modulos.map( modulo => modulo.id ))
         //Funcionalidades por modulos obtenidas
@@ -44,5 +46,5 @@ export class RepositorioAutorizacionDB implements RepositorioAutorizacion {
             })
         })
         return modulos
-    } */
+    }
 }

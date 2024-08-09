@@ -11,6 +11,6 @@ export class ModuloDto{
         this.id = modulo.id
         this.nombre = modulo.nombreMostrar
         this.ruta = modulo.ruta
-      //  this.submodulos = modulo.submodulos.map( submodulo => new SubmoduloDto(submodulo))
+        this.submodulos = modulo.submodulos.map( submodulo => new SubmoduloDto(submodulo))
     }
 }
