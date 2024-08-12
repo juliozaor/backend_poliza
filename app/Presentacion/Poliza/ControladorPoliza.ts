@@ -120,4 +120,16 @@ export default class ControladorRol {
    }
 
 
+   public async interoperabilidad ({request,response}:HttpContextContract ){
+    const { documento } = await request.obtenerPayloadJWT()
+    const placas = await this.service.interoperabilidad(request.all(), documento)
+    return placas
+  }
+
+  public async novedadesPoliza ({request,response}:HttpContextContract ){
+    const novedades = await this.service.novedadesPoliza(request.all())
+    return novedades
+  }
+
+
 }

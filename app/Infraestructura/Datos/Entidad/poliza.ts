@@ -19,8 +19,8 @@ export default class TblPolizas extends BaseModel {
   @column({ columnName: 'pol_vigilado_id' }) public vigiladoId?: string
   @column({ columnName: 'pol_responsabilidad' }) public responsabilidad?: boolean
   @column({ columnName: 'pol_estado' }) public estado?: boolean
-  @column.dateTime({ autoCreate: true , columnName: 'pol_creado'}) public createdAt: DateTime
-  @column.dateTime({ autoCreate: true, autoUpdate: true, columnName: 'pol_actualizado' }) public updatedAt: DateTime
+  @column.dateTime({ autoCreate: true , columnName: 'pol_creado'}) public creado: DateTime
+  @column.dateTime({ autoCreate: true, autoUpdate: true, columnName: 'pol_actualizado' }) public actualizado: DateTime
 
  
 

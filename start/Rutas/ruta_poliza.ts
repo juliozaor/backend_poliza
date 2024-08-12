@@ -12,7 +12,12 @@ Route.group(() => {
 
     Route.get('/listar_polizas', accion_path + '.listarPolizas')
     Route.get('/listar_vehiculos', accion_path + '.listarVehiculos')
+    Route.get('/interoperabilidad', accion_path + '.interoperabilidad')
     Route.delete('/eliminar_vehiculos', accion_path + '.eliminarVehiculos')
     Route.post('/agregar_vehiculos', accion_path + '.agregarVehiculos')
+
+    Route.get('/novedades_poliza', accion_path + '.novedadesPoliza')
+
+
 
 }).prefix('api/v1/poliza').middleware('autenticacionJwt')

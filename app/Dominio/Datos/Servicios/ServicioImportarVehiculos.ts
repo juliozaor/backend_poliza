@@ -9,8 +9,7 @@ import { RespuestaImportacionExcel } from './Dtos/RespuestaImportacionExcel';
 import TblVehiculos from 'App/Infraestructura/Datos/Entidad/Vehiculos';
 import { Vehiculo } from '../Entidades/Vehiculo';
 import TblPolizas from 'App/Infraestructura/Datos/Entidad/poliza';
-import Errores from 'App/Exceptions/Errores';
-import Database from '@ioc:Adonis/Lucid/Database';
+import { TblLogVehiculos } from 'App/Infraestructura/Datos/Entidad/LogVehiculos';
 
 export class ServicioImportarVehiculos {
   async importDataXLSX(
@@ -56,7 +55,6 @@ export class ServicioImportarVehiculos {
       rutaArchivo = filePath;
 
       
-      // Resto de la lógica del servicio...
       let resultado = await this.importVehiculos(filePath, poliza, id, tipo)
       return resultado
     } catch (error) {
@@ -134,9 +132,21 @@ export class ServicioImportarVehiculos {
             vigiladoId:id,
             tipoPoliza
           }
+
+          const inputlog = {
+            tipoPoliza,
+            poliza,
+            placa,
+            vinculada:true,
+            observacion:'CARGUE INICIAL'
+          }
+
+
+
           try {
            // await TblVehiculos.updateOrCreate({ placa: inputPlaca.placa }, inputPlaca)
             await TblVehiculos.create(inputPlaca)
+            await TblLogVehiculos.create(inputlog)
           } catch (error) {
             console.log(error);
             

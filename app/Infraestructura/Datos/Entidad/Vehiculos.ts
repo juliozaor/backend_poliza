@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import { BaseModel, BelongsTo, belongsTo, column} from '@ioc:Adonis/Lucid/Orm';
+import { BaseModel, BelongsTo, belongsTo, column, hasMany} from '@ioc:Adonis/Lucid/Orm';
 import TblPolizas from './poliza';
 import { Vehiculo } from 'App/Dominio/Datos/Entidades/Vehiculo';
 
@@ -10,6 +10,8 @@ export default class TblVehiculos extends BaseModel {
   @column({ columnName: 'veh_poliza' }) public poliza: number  
   @column({ columnName: 'veh_vigilado_id' }) public vigiladoId: string  
   @column({ columnName: 'veh_tipo_poliza' }) public tipoPoliza?: number  
+  @column({ columnName: 'veh_vinculada' }) public vinculada?: boolean  
+  @column({ columnName: 'veh_observacion' }) public observacion?: string  
  
   @column.dateTime({ autoCreate: true , columnName: 'veh_creado'}) public createdAt: DateTime
   @column.dateTime({ autoCreate: true, autoUpdate: true, columnName: 'veh_actualizado' }) public updatedAt: DateTime 
@@ -21,7 +23,9 @@ export default class TblVehiculos extends BaseModel {
     this.pasajeros = vehiculo.pasajeros
     this.poliza = vehiculo.poliza
     this.vigiladoId = vehiculo.vigiladoId
-    this.tipoPoliza = this.tipoPoliza
+    this.tipoPoliza = vehiculo.tipoPoliza
+    this.vinculada = vehiculo.vinculada
+    this.observacion = vehiculo.observacion
   }
 
   public estableceVehiculoConId (vehiculo: Vehiculo) {
@@ -29,7 +33,9 @@ export default class TblVehiculos extends BaseModel {
     this.pasajeros = vehiculo.pasajeros
     this.poliza = vehiculo.poliza
     this.vigiladoId = vehiculo.vigiladoId
-    this.tipoPoliza = this.tipoPoliza
+    this.tipoPoliza = vehiculo.tipoPoliza
+    this.vinculada = vehiculo.vinculada
+    this.observacion = vehiculo.observacion
   }
 
   public obtenerVehiculo (): Vehiculo {
@@ -40,6 +46,8 @@ export default class TblVehiculos extends BaseModel {
     vehiculo.poliza = this.poliza
     vehiculo.vigiladoId = this.vigiladoId
     vehiculo.tipoPoliza = this.tipoPoliza
+    vehiculo.vinculada = this.vinculada
+    vehiculo.observacion = this.observacion
     return vehiculo
   }
 
@@ -49,6 +57,8 @@ export default class TblVehiculos extends BaseModel {
     foreignKey: 'poliza',
   })
   public polizas: BelongsTo<typeof TblPolizas>
+
+
 
 
 }

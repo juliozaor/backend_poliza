@@ -36,4 +36,12 @@ export class ServicioPoliza{
     return this.repositorio.agregarVehiculos(datos, vigiladoId)
   }
 
+  async interoperabilidad (datos:any, nit: string): Promise<any>{
+    return this.repositorio.interoperabilidad(datos, nit)
+  }
+
+  async novedadesPoliza (datos:any): Promise<any>{
+    return this.repositorio.novedadesPoliza(datos)
+  }
+
 }

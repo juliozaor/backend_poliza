@@ -5,5 +5,7 @@ export class Vehiculo {
   poliza: number  
   vigiladoId: string  
   tipoPoliza?: number  
+  vinculada?: boolean
+  observacion?:string
 }
 

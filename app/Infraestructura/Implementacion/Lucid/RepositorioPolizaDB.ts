@@ -12,6 +12,7 @@ import { MapeadorPaginacionDB } from "./MapeadorPaginacionDB";
 import Errores from "App/Exceptions/Errores";
 import { ServicioEstados } from "App/Dominio/Datos/Servicios/ServicioEstados";
 import TblVehiculos from "App/Infraestructura/Datos/Entidad/Vehiculos";
+import { TblLogVehiculos } from "App/Infraestructura/Datos/Entidad/LogVehiculos";
 
 export class RepositorioPolizaDB implements RepositorioPoliza {
   private servicioEstados = new ServicioEstados();
@@ -315,6 +316,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
 
     let query = TblPolizas.query()
       .preload("tipoPoliza")
+      .preload('aseguradoras')
       .where("pol_vigilado_id", id);
 
     if (poliza) {
@@ -335,14 +337,31 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
 
     const datos = await query.paginate(pagina, limite);
 
-    datos.forEach((dato) => {
+    const fechaActual = new Date(); 
+
+    for (const dato of datos) {
+      const estadoPoliza =new Date(dato.finVigencia) < fechaActual ? 'INACTIVA' : 'ACTIVA';
+  
+      // Contar la cantidad de vehículos vinculados
+      const cantidadVehiculos = await TblVehiculos.query()
+        .where('veh_poliza', dato.numero)
+        .andWhere('veh_tipo_poliza', dato.tipoPolizaId!)
+        .andWhere('veh_vinculada', true)
+        .count('* as total')
+        .first();        
+  
       polizas.push({
-        poliza: dato.numero,
         tipoPoliza: dato.tipoPoliza.descripcion,
+        poliza: dato.numero,
+        fechaCargue: dato.creado,
         fechaInicio: dato.inicioVigencia,
         fechaFin: dato.finVigencia,
+        aseguradora: dato.aseguradoras.nombre,
+        estadoPoliza: estadoPoliza,
+        cantidadVehiculos: cantidadVehiculos?.$extras.total
       });
-    });
+    }
+
 
     const paginacion = MapeadorPaginacionDB.obtenerPaginacion(datos);
 
@@ -424,5 +443,70 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
   
     return { mensaje: 'Vehículos fueron eliminados con éxito' }; 
   }
+
+  async interoperabilidad(datos: any, nit: string): Promise<any> {
+    const { poliza, tipoPoliza } = datos;
+    const placasInteroperabilidad = this.consultarInteroperabilidad() //Reemplazar por el api de interoperabilidad
+    const vehiculos = await TblVehiculos.query()
+    .where('veh_poliza', poliza)
+    .andWhere('veh_tipo_poliza', tipoPoliza)
+    .select('veh_placa');
+  
+    
+  const placasVehiculos = vehiculos.map(vehiculo => vehiculo.placa);  
+  const placasDisponibles = placasInteroperabilidad.filter(placa => !placasVehiculos.includes(placa));  
+  return { placasDisponibles };
+
+  }
+
+  async novedadesPoliza(datos: any): Promise<any> {
+    const { poliza, tipoPoliza } = datos;
+   const novedades = await TblLogVehiculos.query().where({'poliza':poliza,'tipoPoliza': tipoPoliza}).orderBy('creacion','desc')
+   return novedades.map(n =>{
+    return { 
+      tipoPoliza: n.tipoPoliza, 
+      poliza: n.poliza,
+      placa: n.placa,
+      fechaActualizacion: n.creacion,
+      estado:n.vinculada?'VINCULADA':'NO VINCULADA',
+      observacion: n.observacion
+     }
+   })
+
+  }
+
+
+  generarPlaca() {
+    const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const numeros = '0123456789';
+    
+    // Generar 3 letras aleatorias
+    let placa = '';
+    for (let i = 0; i < 3; i++) {
+      placa += letras.charAt(Math.floor(Math.random() * letras.length));
+    }
+    
+    // Generar 3 números aleatorios
+    for (let i = 0; i < 3; i++) {
+      placa += numeros.charAt(Math.floor(Math.random() * numeros.length));
+    }
+    
+    return placa;
+  }
+  
+  consultarInteroperabilidad() {
+    // Definir el número de placas aleatorias entre 10 y 15
+    const cantidad = Math.floor(Math.random() * (15 - 10 + 1)) + 10;
+    const placas = new Array();
+    
+    // Generar las placas
+    for (let i = 0; i < cantidad; i++) {
+      placas.push(this.generarPlaca());
+    }
+    
+    return placas;
+  }
+  
+  
 
 }
