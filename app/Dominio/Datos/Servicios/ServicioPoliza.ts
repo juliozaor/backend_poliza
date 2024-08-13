@@ -48,4 +48,8 @@ export class ServicioPoliza{
     return this.repositorio.gestionarPlaca(placa, vigiladoId)
   }
 
+  async desvincularPlaca (id:number, motivo: string): Promise<any>{
+    return this.repositorio.desvincularPlaca(id, motivo)
+  }
+
 }

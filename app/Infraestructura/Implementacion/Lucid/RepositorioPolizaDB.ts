@@ -535,12 +535,14 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
 
    const contractualDb = vehiculos.find(c => c.tipoPoliza == 1)
    const extraContractualDb = vehiculos.find(c => c.tipoPoliza == 2)
+   
    let contractual:any
    let extraContractual:any
 
    const fechaActual = new Date();  
     if(contractualDb){
       contractual = {
+        id:contractualDb.id,
         poliza: contractualDb?.poliza,
         estadoPoliza: new Date(contractualDb?.polizas.finVigencia) < fechaActual ? 'INACTIVA' : 'ACTIVA',
         fechaCargue: contractualDb.polizas.creado,
@@ -561,6 +563,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
 
     if(extraContractualDb){
       extraContractual = {
+        id:extraContractualDb.id,
         poliza: extraContractualDb?.poliza,
         estadoPoliza: new Date(extraContractualDb?.polizas.finVigencia) < fechaActual ? 'INACTIVA' : 'ACTIVA',
         fechaCargue: extraContractualDb.polizas.creado,
@@ -612,5 +615,25 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
     return mensaje
   }
 
+  async desvincularPlaca(id: number, motivo:string): Promise<any> { 
+    const vehiculo = await TblVehiculos.findBy('id', id)
+    if(vehiculo){
+    vehiculo.vinculada = false
+    await vehiculo.save()
+
+    const log = new TblLogVehiculos()
+    log.tipoPoliza = vehiculo.tipoPoliza!
+    log.poliza = vehiculo.poliza
+    log.placa = vehiculo.placa;
+    log.vinculada = false
+    log.vigiladoId = vehiculo.vigiladoId
+    log.observacion = motivo
+    await log.save()
+
+    return {mensaje:'Placa desvinculada'}
+    }
+    return {mensaje:'no existe la placa'}
+
+  }
 
 }

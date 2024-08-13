@@ -147,5 +147,11 @@ export default class ControladorRol {
     }
    }
 
+   public async desvincularPlaca ({request,response}:HttpContextContract ){
+    const { id, motivo } = request.all()
+    const placas = await this.service.desvincularPlaca(id, motivo )
+    return placas
+  }
+
 
 }
