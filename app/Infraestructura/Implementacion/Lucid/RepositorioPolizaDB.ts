@@ -373,7 +373,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
     
       const vehiculos= new Array();
 
-    let query = TblVehiculos.query().where({'veh_poliza': poliza, 'veh_tipo_poliza':tipoPoliza})
+    let query = TblVehiculos.query().where({'veh_poliza': poliza, 'veh_tipo_poliza':tipoPoliza, 'veh_vigilado_id': id})
  
     if (placa) {
       query.andWhere('veh_placa',placa)
@@ -397,21 +397,40 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
   }
 
   async agregarVehiculos(params: any, id:string): Promise<any> {  
-    const {poliza, tipoPoliza, placa, pasajeros } = params
+    const {poliza, tipoPoliza, vehiculos } = params
 
-    const existe = await TblVehiculos.query().where({'veh_placa':placa, 'veh_poliza': poliza, 'veh_tipo_poliza':tipoPoliza}).first()
-    if(existe){
-      return { mensaje: 'El vehiculo ya existe' }
+    for await (const vehiculo of vehiculos) {
+      const existe = await TblVehiculos.query().where({'veh_placa':vehiculo.placa, 'veh_poliza': poliza, 'veh_tipo_poliza':tipoPoliza, 'veh_vigilado_id': id}).first()
+      if(!existe){
+        const vehiculoNew = new TblVehiculos();
+        vehiculoNew.poliza = poliza;
+        vehiculoNew.tipoPoliza = tipoPoliza;
+        vehiculoNew.placa = vehiculo.placa;
+        vehiculoNew.pasajeros = vehiculo.pasajeros;
+        vehiculoNew.vigiladoId = id
+        vehiculoNew.vinculada = true
+        vehiculoNew.observacion = 'GESTION DE POLIZA'
+        await vehiculoNew.save()
+
+        const log = new TblLogVehiculos()
+        log.tipoPoliza = tipoPoliza
+        log.poliza = poliza
+        log.placa = vehiculo.placa;
+        log.vinculada = true
+        log.vigiladoId = id
+        log.observacion = 'GESTION DE POLIZA'
+        await log.save()
+      }else{
+        existe.pasajeros = vehiculo.pasajeros
+        existe.vinculada = true
+        await existe.save()
+      }
+      
+  
+      
     }
     
-    const vehiculo = new TblVehiculos();
-    vehiculo.poliza = poliza;
-    vehiculo.tipoPoliza = tipoPoliza;
-    vehiculo.placa = placa;
-    vehiculo.pasajeros = pasajeros;
-    await vehiculo.save()
-
-    return { mensaje: 'Vehiculo agregado con exito' }    
+    return { mensaje: 'Vehiculos agregados con exito' }    
 
       
 
@@ -444,12 +463,11 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
     return { mensaje: 'Vehículos fueron eliminados con éxito' }; 
   }
 
-  async interoperabilidad(datos: any, nit: string): Promise<any> {
+  async interoperabilidad(datos: any, nit: string, id: string): Promise<any> {
     const { poliza, tipoPoliza } = datos;
     const placasInteroperabilidad = this.consultarInteroperabilidad() //Reemplazar por el api de interoperabilidad
     const vehiculos = await TblVehiculos.query()
-    .where('veh_poliza', poliza)
-    .andWhere('veh_tipo_poliza', tipoPoliza)
+    .where({'veh_poliza': poliza,'veh_tipo_poliza': tipoPoliza, 'veh_vigilado_id':id, 'veh_vinculada': true})
     .select('veh_placa');
   
     
@@ -508,5 +526,91 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
   }
   
   
+  async gestionarPlaca(placa: string, id:string): Promise<any> { 
+
+   const vehiculos = await TblVehiculos.query().preload('polizas', pol =>{
+    pol.preload('aseguradoras')
+   }).where({'placa':placa, 'vigiladoId': id})
+
+
+   const contractualDb = vehiculos.find(c => c.tipoPoliza == 1)
+   const extraContractualDb = vehiculos.find(c => c.tipoPoliza == 2)
+   let contractual:any
+   let extraContractual:any
+
+   const fechaActual = new Date();  
+    if(contractualDb){
+      contractual = {
+        poliza: contractualDb?.poliza,
+        estadoPoliza: new Date(contractualDb?.polizas.finVigencia) < fechaActual ? 'INACTIVA' : 'ACTIVA',
+        fechaCargue: contractualDb.polizas.creado,
+        fechaInicio: contractualDb.polizas.inicioVigencia,
+        fechaFin: contractualDb.polizas.finVigencia,
+        aseguradora: contractualDb.polizas.aseguradoras.nombre,
+        vinculada: contractualDb.vinculada,
+        observacion:contractualDb.observacion,
+        existe:true,
+        mensaje: this.mensajes(contractualDb?.polizas.finVigencia)
+      }  
+    }else{
+      contractual = {
+        existe:false,
+        mensaje: 'NO SE REPORTA INFORMACION'
+      }
+    }
+
+    if(extraContractualDb){
+      extraContractual = {
+        poliza: extraContractualDb?.poliza,
+        estadoPoliza: new Date(extraContractualDb?.polizas.finVigencia) < fechaActual ? 'INACTIVA' : 'ACTIVA',
+        fechaCargue: extraContractualDb.polizas.creado,
+        fechaInicio: extraContractualDb.polizas.inicioVigencia,
+        fechaFin: extraContractualDb.polizas.finVigencia,
+        aseguradora: extraContractualDb.polizas.aseguradoras.nombre,
+        vinculada: extraContractualDb.vinculada,
+        observacion:extraContractualDb.observacion,
+        existe:true,
+        mensaje: this.mensajes(extraContractualDb?.polizas.finVigencia)
+      }  
+    }else{
+      extraContractual = {
+        existe:false,
+        mensaje: 'NO SE REPORTA INFORMACION'
+      }
+    }
+
+   // Novedades
+   const novedadesDb = await TblLogVehiculos.query().where({'placa':placa,'vigiladoId': id}).orderBy('creacion','desc')
+   const novedades = novedadesDb.map(n =>{
+    return { 
+      tipoPoliza: n.tipoPoliza, 
+      poliza: n.poliza,
+      placa: n.placa,
+      fechaActualizacion: n.creacion,
+      estado:n.vinculada?'VINCULADA':'NO VINCULADA',
+      observacion: n.observacion
+     }
+   })  
+
+   return {contractual, extraContractual, novedades}
+   
+
+
+  }
+
+  mensajes = (fechaFin: string):string =>{
+    const fechaActual = new Date(); 
+    const fecha = new Date(fechaFin);
+    let mensaje:string = ''
+
+    if( fecha == fechaActual){
+      mensaje = 'HOY VENCE LA COBERTURA DE SU POLIZA'
+    }else if(fecha  > fechaActual){
+      mensaje = 'LA COBERTURA DE SU POLIZA SE ENCUENTRA VENCIDA. ( 3O DIAS )'
+    }
+
+    return mensaje
+  }
+
 
 }

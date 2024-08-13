@@ -17,7 +17,6 @@ Route.group(() => {
     Route.post('/agregar_vehiculos', accion_path + '.agregarVehiculos')
 
     Route.get('/novedades_poliza', accion_path + '.novedadesPoliza')
-
-
+    Route.get('/gestionar-placa', accion_path + '.gestionarPlaca')
 
 }).prefix('api/v1/poliza').middleware('autenticacionJwt')

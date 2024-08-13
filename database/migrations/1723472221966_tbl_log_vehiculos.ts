@@ -11,6 +11,7 @@ export default class extends BaseSchema {
       table.string('lov_placa',6)
       table.boolean('lov_vinculada')
       table.text('lov_observacion')
+      table.string('lov_vigilado_id')
       table.timestamp('lov_creado', { useTz: true })
     })
   }

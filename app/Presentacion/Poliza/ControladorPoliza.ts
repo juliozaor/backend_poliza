@@ -121,8 +121,8 @@ export default class ControladorRol {
 
 
    public async interoperabilidad ({request,response}:HttpContextContract ){
-    const { documento } = await request.obtenerPayloadJWT()
-    const placas = await this.service.interoperabilidad(request.all(), documento)
+    const { documento, id } = await request.obtenerPayloadJWT()
+    const placas = await this.service.interoperabilidad(request.all(), documento, id)
     return placas
   }
 
@@ -130,6 +130,22 @@ export default class ControladorRol {
     const novedades = await this.service.novedadesPoliza(request.all())
     return novedades
   }
+
+  public async gestionarPlaca ({request, response}:HttpContextContract ){
+    
+    const { id } = await request.obtenerPayloadJWT()
+    const { placa } = request.all()
+    try {     
+     
+      const polizas = await this.service.gestionarPlaca(placa, id)
+ 
+      return polizas
+    } catch (error) {
+     
+     throw error;
+     
+    }
+   }
 
 
 }

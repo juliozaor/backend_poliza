@@ -13,7 +13,7 @@ export default class extends BaseSchema {
 
   public async down () {
     this.schema.alterTable(this.tableName, (table) => {
-      table.dropColumn('veh_vinculado')
+      table.dropColumn('veh_vinculada')
       table.dropColumn('veh_observacion')  
   })
   }

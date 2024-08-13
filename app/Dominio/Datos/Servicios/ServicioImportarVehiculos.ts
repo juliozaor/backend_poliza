@@ -138,6 +138,7 @@ export class ServicioImportarVehiculos {
             poliza,
             placa,
             vinculada:true,
+            vigiladoId:id,
             observacion:'CARGUE INICIAL'
           }
 

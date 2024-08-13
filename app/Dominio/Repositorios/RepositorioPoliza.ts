@@ -8,8 +8,9 @@ export interface RepositorioPoliza {
   listarVehiculos(datos:any, vigiladoId: string): Promise<any>
   eliminarVehiculos(datos:any, vigiladoId: string): Promise<any>
   agregarVehiculos(datos:any, vigiladoId: string): Promise<any>
-  interoperabilidad(datos:any, nit: string): Promise<any>
+  interoperabilidad(datos:any, nit: string, id: string): Promise<any>
   novedadesPoliza(datos:any): Promise<any>
+  gestionarPlaca(placa:string, vigiladoId: string): Promise<any>
 
 }
 
