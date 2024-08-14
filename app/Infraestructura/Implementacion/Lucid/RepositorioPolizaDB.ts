@@ -595,7 +595,47 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
      }
    })  
 
-   return {contractual, extraContractual, novedades}
+   // Historial
+   const polizas = await Database
+   .from('tbl_polizas as po')
+   .leftJoin('tbl_tipos_polizas as ttp', 'ttp.tpo_id', 'po.pol_tipo_poliza_id')
+   .leftJoin('tbl_aseguradoras as ase', 'ase.ase_id', 'po.pol_aseguradora_id')
+   .leftJoin('tbl_vehiculos as tv', function () {
+     this.on('tv.veh_poliza', '=', 'po.pol_numero')
+       .on('tv.veh_tipo_poliza', '=', 'po.pol_tipo_poliza_id')
+   })
+   .select(
+     'po.pol_numero as poliza',
+     'ttp.tpo_descripcion as tipo_poliza',
+     'ase.ase_nombre as aseguradora',
+     'po.pol_inicio_vigencia as inicio_vigencia',
+     'po.pol_fin_vigencia as fin_vigencia',
+     'po.pol_creado as creado',
+     'tv.veh_placa as placa'
+   )
+   .where('tv.veh_placa', placa)
+   .andWhere('po.pol_vigilado_id', id)
+
+ const historial: any[] = [];
+
+ // Procesa los resultados de la consulta
+ for (const dato of polizas) {
+   const estadoPoliza = new Date(dato.fin_vigencia) < fechaActual ? 'INACTIVA' : 'ACTIVA';
+
+   historial.push({
+     tipoPoliza: dato.tipo_poliza,
+     poliza: dato.poliza,
+     placa: dato.placa,
+     estadoPoliza: estadoPoliza,
+     fechaCargue: dato.creado,
+     fechaInicio: dato.inicio_vigencia,
+     fechaFin: dato.fin_vigencia,
+     aseguradora: dato.aseguradora,
+   });
+ }
+
+
+   return {contractual, extraContractual, novedades, historial}
    
 
 
