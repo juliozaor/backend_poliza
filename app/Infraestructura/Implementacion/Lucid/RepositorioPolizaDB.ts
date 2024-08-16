@@ -336,11 +336,8 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
     }
 
     const datos = await query.paginate(pagina, limite);
-
-    const fechaActual = new Date(); 
-
+    
     for (const dato of datos) {
-      const estadoPoliza =new Date(dato.finVigencia) < fechaActual ? 'INACTIVA' : 'ACTIVA';
   
       // Contar la cantidad de vehículos vinculados
       const cantidadVehiculos = await TblVehiculos.query()
@@ -357,7 +354,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
         fechaInicio: dato.inicioVigencia,
         fechaFin: dato.finVigencia,
         aseguradora: dato.aseguradoras.nombre,
-        estadoPoliza: estadoPoliza,
+        estadoPoliza: this.compararFecha(dato.finVigencia),
         cantidadVehiculos: cantidadVehiculos?.$extras.total
       });
     }
@@ -367,6 +364,8 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
 
     return { polizas, paginacion };
   }
+
+
 
     async listarVehiculos(params: any, id:string): Promise<any> {  
     const {pagina, limite, poliza, tipoPoliza, placa } = params
@@ -409,7 +408,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
         vehiculoNew.pasajeros = vehiculo.pasajeros;
         vehiculoNew.vigiladoId = id
         vehiculoNew.vinculada = true
-        vehiculoNew.observacion = 'GESTION DE POLIZA'
+        vehiculoNew.observacion = 'GESTIÓN DE POLIZA'
         await vehiculoNew.save()
 
         const log = new TblLogVehiculos()
@@ -418,7 +417,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
         log.placa = vehiculo.placa;
         log.vinculada = true
         log.vigiladoId = id
-        log.observacion = 'GESTION DE POLIZA'
+        log.observacion = 'GESTIÓN DE POLIZA'
         await log.save()
       }else{
         existe.pasajeros = vehiculo.pasajeros
@@ -528,13 +527,36 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
   
   async gestionarPlaca(placa: string, id:string): Promise<any> { 
 
-   const vehiculos = await TblVehiculos.query().preload('polizas', pol =>{
+   /* const vehiculos = await TblVehiculos.query().preload('polizas', pol =>{
     pol.preload('aseguradoras')
-   }).where({'placa':placa, 'vigiladoId': id})
+   }).where({'placa':placa, 'vigiladoId': id}) */
 
+   const vehiculos = await Database
+   .from('tbl_vehiculos as tv')
+   .leftJoin('tbl_polizas as po', function () {
+     this.on('tv.veh_poliza', '=', 'po.pol_numero')
+     .on('tv.veh_tipo_poliza', '=', 'po.pol_tipo_poliza_id')
+     
+    })
+    .leftJoin('tbl_aseguradoras as ase', 'ase.ase_id', 'po.pol_aseguradora_id')
+   .select(
+     'tv.veh_id as id',
+     'po.pol_numero as poliza',
+     'ase.ase_nombre as aseguradora',
+     'po.pol_inicio_vigencia as inicioVigencia',
+     'po.pol_fin_vigencia as finVigencia',
+     'po.pol_creado as creado',
+     'tv.veh_placa as placa',
+     'tv.veh_vinculada as vinculado',
+     'tv.veh_observacion as observacion',
+     'po.pol_tipo_poliza_id as tipoPoliza'
+   )
+   .where('tv.veh_placa', placa)
+   .andWhere('po.pol_vigilado_id', id)
 
    const contractualDb = vehiculos.find(c => c.tipoPoliza == 1)
    const extraContractualDb = vehiculos.find(c => c.tipoPoliza == 2)
+   
    
    let contractual:any
    let extraContractual:any
@@ -543,16 +565,16 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
     if(contractualDb){
       contractual = {
         id:contractualDb.id,
-        poliza: contractualDb?.poliza,
-        estadoPoliza: new Date(contractualDb?.polizas.finVigencia) < fechaActual ? 'INACTIVA' : 'ACTIVA',
-        fechaCargue: contractualDb.polizas.creado,
-        fechaInicio: contractualDb.polizas.inicioVigencia,
-        fechaFin: contractualDb.polizas.finVigencia,
-        aseguradora: contractualDb.polizas.aseguradoras.nombre,
+        poliza: contractualDb?.poliza,        
+        estadoPoliza: this.compararFecha(contractualDb?.finVigencia),
+        fechaCargue: contractualDb.creado,
+        fechaInicio: contractualDb.inicioVigencia,
+        fechaFin: contractualDb.finVigencia,
+        aseguradora: contractualDb.nombre,
         vinculada: contractualDb.vinculada,
         observacion:contractualDb.observacion,
         existe:true,
-        mensaje: this.mensajes(contractualDb?.polizas.finVigencia)
+        mensaje: this.mensajes(contractualDb?.finVigencia)
       }  
     }else{
       contractual = {
@@ -564,16 +586,16 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
     if(extraContractualDb){
       extraContractual = {
         id:extraContractualDb.id,
-        poliza: extraContractualDb?.poliza,
-        estadoPoliza: new Date(extraContractualDb?.polizas.finVigencia) < fechaActual ? 'INACTIVA' : 'ACTIVA',
-        fechaCargue: extraContractualDb.polizas.creado,
-        fechaInicio: extraContractualDb.polizas.inicioVigencia,
-        fechaFin: extraContractualDb.polizas.finVigencia,
-        aseguradora: extraContractualDb.polizas.aseguradoras.nombre,
+        poliza: extraContractualDb?.poliza,        
+        estadoPoliza: this.compararFecha(extraContractualDb?.finVigencia),
+        fechaCargue: extraContractualDb.creado,
+        fechaInicio: extraContractualDb.inicioVigencia,
+        fechaFin: extraContractualDb.finVigencia,
+        aseguradora: extraContractualDb.nombre,
         vinculada: extraContractualDb.vinculada,
         observacion:extraContractualDb.observacion,
         existe:true,
-        mensaje: this.mensajes(extraContractualDb?.polizas.finVigencia)
+        mensaje: this.mensajes(extraContractualDb?.finVigencia)
       }  
     }else{
       extraContractual = {
@@ -620,13 +642,11 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
 
  // Procesa los resultados de la consulta
  for (const dato of polizas) {
-   const estadoPoliza = new Date(dato.fin_vigencia) < fechaActual ? 'INACTIVA' : 'ACTIVA';
-
    historial.push({
      tipoPoliza: dato.tipo_poliza,
      poliza: dato.poliza,
      placa: dato.placa,
-     estadoPoliza: estadoPoliza,
+     estadoPoliza: this.compararFecha(dato.fin_vigencia),
      fechaCargue: dato.creado,
      fechaInicio: dato.inicio_vigencia,
      fechaFin: dato.fin_vigencia,
@@ -643,16 +663,34 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
 
   mensajes = (fechaFin: string):string =>{
     const fechaActual = new Date(); 
-    const fecha = new Date(fechaFin);
-    let mensaje:string = ''
+    const fecha = new Date(fechaFin);   
 
-    if( fecha == fechaActual){
-      mensaje = 'HOY VENCE LA COBERTURA DE SU POLIZA'
-    }else if(fecha  > fechaActual){
-      mensaje = 'LA COBERTURA DE SU POLIZA SE ENCUENTRA VENCIDA. ( 3O DIAS )'
+    const hoy = new Date(`${fechaActual.getFullYear()}-${fechaActual.getMonth()+1}-${fechaActual.getDate()}`) 
+    const fin = new Date(`${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}`)
+    
+
+    if( fin < hoy){
+      const nVencida = hoy.getTime() - fin.getTime()
+      const diferenciaDias = Math.floor(nVencida / (1000 * 60 * 60 * 24));
+
+      return `LA COBERTURA DE SU POLIZA SE ENCUENTRA VENCIDA. (${diferenciaDias} DÍAS)`      
+    }else if(fin > hoy){
+      return ''      
+    }else{      
+      return 'HOY VENCE LA COBERTURA DE SU POLIZA'
     }
 
-    return mensaje
+  }
+
+  compararFecha = (fechaFin: string): string =>{
+    const fechaActual = new Date(); 
+    const fecha = new Date(fechaFin);   
+
+    const hoy = new Date(`${fechaActual.getFullYear()}-${fechaActual.getMonth()+1}-${fechaActual.getDate()}`) 
+    const fin = new Date(`${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}`)
+    
+    
+    return fin < hoy ? 'INACTIVA' : 'ACTIVA';
   }
 
   async desvincularPlaca(id: number, motivo:string): Promise<any> { 
