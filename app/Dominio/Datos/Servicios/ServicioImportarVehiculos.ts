@@ -104,7 +104,7 @@ export class ServicioImportarVehiculos {
 
   async import(colComment: Excel.Column,hoja: Excel.Worksheet, poliza:number, id:string, tipoPoliza:number): Promise<Resultado<RespuestaImportacionExcel>> {
     
-    const errores = await this.validarVehiculos(hoja, poliza)
+    const errores = await this.validarVehiculos(hoja, poliza, id)
     
     if (errores.length > 0) {
       const archivoB64 = await this.generarCsvErrores(errores)
@@ -164,7 +164,7 @@ export class ServicioImportarVehiculos {
   }
 
 
-  async validarVehiculos(hoja: Excel.Worksheet, poliza: number): Promise<ErrorFormatoImportarExcel[]> {
+  async validarVehiculos(hoja: Excel.Worksheet, poliza: number, id:string): Promise<ErrorFormatoImportarExcel[]> {
     let errores: ErrorFormatoImportarExcel[] = [];
   let seEncontroFilaValida = false;
 
@@ -194,6 +194,33 @@ export class ServicioImportarVehiculos {
         valor: placa
       });
     } else {
+
+      const vehiculos = await TblVehiculos.query()
+      .where({'veh_placa': placa, 'veh_vigilado_id':id})
+      .preload('polizas')
+
+      vehiculos.forEach(veh => {
+        const fechaActual = new Date(); 
+        const fecha = new Date(veh.polizas.finVigencia);   
+
+    const hoy = new Date(`${fechaActual.getFullYear()}-${fechaActual.getMonth()+1}-${fechaActual.getDate()}`) 
+    const fin = new Date(`${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}`)      
+        if (fin >= hoy) {
+          errores.push({
+            columna: 'A',
+            fila: i.toString(),
+            error: `La placa ya se encuentra registrada en una póliza activa, póliza: ${veh.polizas.numero}` ,
+            valor: placa
+          });
+        }
+        
+      });
+  
+
+
+
+
+
       //try {
         // Consultar si la placa existe en la tabla TblVehiculos
        
