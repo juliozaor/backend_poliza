@@ -22,7 +22,11 @@ export class ServicioImportarVehiculos {
     try {
 
 
-      const polizaDBExiste = await TblPolizas.findBy('pol_numero', poliza);
+     /*  const polizaDBExiste = await TblPolizas.findBy('pol_numero', poliza); */
+     const polizaDBExiste = await TblPolizas.query()
+      .where("pol_numero", poliza)
+      .andWhere("pol_tipo_poliza_id", tipo)
+      .first();
         
       if (polizaDBExiste) {      
         return new Resultado({
@@ -32,7 +36,7 @@ export class ServicioImportarVehiculos {
         });
       }
 
-
+      await TblVehiculos.query().where('veh_poliza',poliza).andWhere('veh_tipo_poliza',tipo).delete();
 
       const fname = `${new Date().getTime()}.${archivo.extname}`;
       const dir = 'uploads/';
@@ -116,7 +120,7 @@ export class ServicioImportarVehiculos {
       })
     }
 
-    await TblVehiculos.query().where('veh_poliza',poliza).andWhere('veh_tipo_poliza',tipoPoliza).delete();
+   /*  await TblVehiculos.query().where('veh_poliza',poliza).andWhere('veh_tipo_poliza',tipoPoliza).delete(); */
     
     colComment.eachCell(async (cell, rowNumber) => {
       if (rowNumber >= 2) {
