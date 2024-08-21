@@ -336,6 +336,11 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
     }
 
     const datos = await query.paginate(pagina, limite);
+
+    const totalVehiculos = await TblVehiculos.query()
+    .where({'veh_vinculada': true, 'veh_vigilado_id':id})
+    .count('* as total')
+    .first();
     
     for (const dato of datos) {
   
@@ -357,12 +362,12 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
         estadoPoliza: this.compararFecha(dato.finVigencia),
         cantidadVehiculos: cantidadVehiculos?.$extras.total
       });
-    }
 
+    }
 
     const paginacion = MapeadorPaginacionDB.obtenerPaginacion(datos);
 
-    return { polizas, paginacion };
+    return { polizas, paginacion, totalVehiculos: totalVehiculos?.$extras.total };
   }
 
 
