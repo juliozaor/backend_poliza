@@ -547,7 +547,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
      'po.pol_fin_vigencia as finVigencia',
      'po.pol_creado as creado',
      'tv.veh_placa as placa',
-     'tv.veh_vinculada as vinculado',
+     'tv.veh_vinculada as vinculada',
      'tv.veh_observacion as observacion',
      'po.pol_tipo_poliza_id as tipoPoliza'
    )
