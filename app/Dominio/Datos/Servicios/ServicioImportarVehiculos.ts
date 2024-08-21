@@ -36,7 +36,8 @@ export class ServicioImportarVehiculos {
         });
       }
 
-      await TblVehiculos.query().where('veh_poliza',poliza).andWhere('veh_tipo_poliza',tipo).delete();
+      await TblVehiculos.query().where('veh_poliza',poliza).andWhere('veh_tipo_poliza',tipo).delete();      
+      await TblLogVehiculos.query().where('lov_poliza',poliza).andWhere('lov_tipo_poliza',tipo).delete();  
 
       const fname = `${new Date().getTime()}.${archivo.extname}`;
       const dir = 'uploads/';
@@ -120,7 +121,6 @@ export class ServicioImportarVehiculos {
       })
     }
 
-   /*  await TblVehiculos.query().where('veh_poliza',poliza).andWhere('veh_tipo_poliza',tipoPoliza).delete(); */
     
     colComment.eachCell(async (cell, rowNumber) => {
       if (rowNumber >= 2) {
@@ -202,6 +202,7 @@ export class ServicioImportarVehiculos {
       const vehiculos = await TblVehiculos.query()
       .where({'veh_placa': placa, 'veh_vigilado_id':id})
       .preload('polizas')
+      .has('polizas')
 
       vehiculos.forEach(veh => {
         const fechaActual = new Date(); 
