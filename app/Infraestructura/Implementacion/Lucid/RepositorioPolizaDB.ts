@@ -584,7 +584,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
     }else{
       contractual = {
         existe:false,
-        mensaje: 'NO SE REPORTA INFORMACION'
+        mensaje: 'NO SE REPORTA INFORMACIÓN'
       }
     }
 
@@ -605,7 +605,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
     }else{
       extraContractual = {
         existe:false,
-        mensaje: 'NO SE REPORTA INFORMACION'
+        mensaje: 'NO SE REPORTA INFORMACIÓN'
       }
     }
 
@@ -678,11 +678,11 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
       const nVencida = hoy.getTime() - fin.getTime()
       const diferenciaDias = Math.floor(nVencida / (1000 * 60 * 60 * 24));
 
-      return `LA COBERTURA DE SU POLIZA SE ENCUENTRA VENCIDA. (${diferenciaDias} DÍAS)`      
+      return `LA COBERTURA DE SU PÓLIZA SE ENCUENTRA VENCIDA. (${diferenciaDias} DÍAS)`      
     }else if(fin > hoy){
       return ''      
     }else{      
-      return 'HOY VENCE LA COBERTURA DE SU POLIZA'
+      return 'HOY VENCE LA COBERTURA DE SU PÓLIZA'
     }
 
   }
