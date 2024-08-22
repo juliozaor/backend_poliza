@@ -337,7 +337,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
 
     const datos = await query.paginate(pagina, limite);
 
-    const totalVehiculos = await TblVehiculos.query()
+    const totalVehiculos = await TblVehiculos.query().andHas('polizas')
     .where({'veh_vinculada': true, 'veh_vigilado_id':id})
     .count('* as total')
     .first();
@@ -351,6 +351,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
         .andWhere('veh_vinculada', true)
         .count('* as total')
         .first();        
+
   
       polizas.push({
         tipoPoliza: dato.tipoPoliza.descripcion,
