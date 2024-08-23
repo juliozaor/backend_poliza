@@ -337,10 +337,28 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
 
     const datos = await query.paginate(pagina, limite);
 
-    const totalVehiculos = await TblVehiculos.query().andHas('polizas')
+    const vehiculosTodos = await TblVehiculos.query().andHas('polizas')
     .where({'veh_vinculada': true, 'veh_vigilado_id':id})
     .count('* as total')
     .first();
+
+    const VehiculosContractualTodos = await TblVehiculos.query().andHas('polizas')
+    .where({'veh_vinculada': true, 'veh_vigilado_id':id, 'veh_tipo_poliza':1})
+    .count('* as total')
+    .first();
+
+    const VehiculosExtraContractualTodos = await TblVehiculos.query().andHas('polizas')
+    .where({'veh_vinculada': true, 'veh_vigilado_id':id, 'veh_tipo_poliza':2})
+    .count('* as total')
+    .first();
+
+    const totalVehiculos = vehiculosTodos?.$extras.total
+    const totalVehiculosContractual = VehiculosContractualTodos?.$extras.total
+    const totalVehiculosExtraContractual = VehiculosExtraContractualTodos?.$extras.total
+
+    
+
+
     
     for (const dato of datos) {
   
@@ -368,7 +386,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
 
     const paginacion = MapeadorPaginacionDB.obtenerPaginacion(datos);
 
-    return { polizas, paginacion, totalVehiculos: totalVehiculos?.$extras.total };
+    return { polizas, paginacion, totalVehiculos, totalVehiculosContractual, totalVehiculosExtraContractual };
   }
 
 
@@ -559,6 +577,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
    )
    .where('tv.veh_placa', placa)
    .andWhere('po.pol_vigilado_id', id)
+   .orderBy('veh_creado', 'desc')
 
    const contractualDb = vehiculos.find(c => c.tipoPoliza == 1)
    const extraContractualDb = vehiculos.find(c => c.tipoPoliza == 2)
