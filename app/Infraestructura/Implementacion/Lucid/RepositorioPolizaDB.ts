@@ -601,7 +601,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
         fechaFin: contractualDb.finVigencia,
         aseguradora: contractualDb.nombre,
         vinculada: contractualDb.vinculada,
-        observacion:contractualDb.observacion,
+        observacion: (contractualDb.vinculada)?'':contractualDb.observacion,
         existe:true,
         mensaje: this.mensajes(contractualDb?.finVigencia)
       }  
@@ -622,7 +622,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
         fechaFin: extraContractualDb.finVigencia,
         aseguradora: extraContractualDb.nombre,
         vinculada: extraContractualDb.vinculada,
-        observacion:extraContractualDb.observacion,
+        observacion:(extraContractualDb.vinculada)?'':extraContractualDb.observacion,
         existe:true,
         mensaje: this.mensajes(extraContractualDb?.finVigencia)
       }  
