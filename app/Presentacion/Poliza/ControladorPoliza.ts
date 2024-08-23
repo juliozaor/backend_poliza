@@ -149,6 +149,9 @@ export default class ControladorRol {
 
    public async desvincularPlaca ({request,response}:HttpContextContract ){
     const { id, motivo } = request.all()
+    if (!id  || !motivo) {
+      return response.status(400).json({ mensaje: 'Falta de información' })      
+    }
     const placas = await this.service.desvincularPlaca(id, motivo )
     return placas
   }

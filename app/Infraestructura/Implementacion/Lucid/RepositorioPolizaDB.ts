@@ -244,7 +244,9 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
         "ttp.tpo_descripcion as tipo",
         "tp.pol_numero as numero_poliza",
         "tv.veh_placa as placa",
-        "tv.veh_pasajeros as pasajeros"
+        "tv.veh_pasajeros as pasajeros",
+        "tv.veh_vinculada as vinculada",
+        "tv.veh_observacion as observacion",
       )
       .innerJoin("tbl_polizas as tp", (join) => {
         join
@@ -280,7 +282,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
           ]);
       });
     }
-    console.log(pagina, limite);
+    
 
     const datos = await query.paginate(pagina, limite);
 
@@ -292,6 +294,8 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
         numero_poliza: dato.numero_poliza,
         placa: dato.placa,
         pasajeros: dato.pasajeros,
+        vinculada: dato.vinculada,
+        observacion: dato.observacion
       });
     });
 
@@ -432,7 +436,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
         vehiculoNew.pasajeros = vehiculo.pasajeros;
         vehiculoNew.vigiladoId = id
         vehiculoNew.vinculada = true
-        vehiculoNew.observacion = 'GESTIÓN DE POLIZA'
+        vehiculoNew.observacion = 'VINCULADA'
         await vehiculoNew.save()
 
         const log = new TblLogVehiculos()
@@ -441,7 +445,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
         log.placa = vehiculo.placa;
         log.vinculada = true
         log.vigiladoId = id
-        log.observacion = 'GESTIÓN DE POLIZA'
+        log.observacion = 'VINCULADA'
         await log.save()
       }else{
         existe.pasajeros = vehiculo.pasajeros
