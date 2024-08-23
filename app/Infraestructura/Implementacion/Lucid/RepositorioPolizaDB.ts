@@ -726,6 +726,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
     const vehiculo = await TblVehiculos.findBy('id', id)
     if(vehiculo){
     vehiculo.vinculada = false
+    vehiculo.observacion = motivo
     await vehiculo.save()
 
     const log = new TblLogVehiculos()
