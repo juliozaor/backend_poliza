@@ -426,8 +426,9 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
   async agregarVehiculos(params: any, id:string): Promise<any> {  
     const {poliza, tipoPoliza, vehiculos } = params
 
-    const vehiculosError= new Array();
     let mensaje = 'Vehículos agregados con éxito'
+    let estado = 200
+    let placasPolizas = ''
 
     for await (const vehiculo of vehiculos) {
     let polizaActiva = false;
@@ -443,10 +444,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
         const fin = new Date(`${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}`)      
             if (fin >= hoy) {
               polizaActiva = true
-              vehiculosError.push({
-                error: `La placa ya se encuentra registrada en una póliza activa, póliza: ${veh.polizas.numero}` ,
-                valor: vehiculo.placa
-              });
+              placasPolizas += `(placa: ${vehiculo.placa} -> póliza: ${veh.polizas.numero}) | `             
             }
             
           });
@@ -482,14 +480,15 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
         log.observacion = 'VINCULADA'
         await log.save() 
        }else{
-        mensaje = 'Algunas placas ya están vinculadas en una póliza activa';
+        mensaje = `Algunas placas ya están vinculadas en una póliza activa: ${placasPolizas}`;
+        estado = 201
        }
     
         
       
     }
     
-    return { mensaje, vehiculosError }    
+    return { mensaje, estado }    
 
       
 
