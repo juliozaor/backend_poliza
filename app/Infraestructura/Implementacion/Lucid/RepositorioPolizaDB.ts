@@ -426,8 +426,36 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
   async agregarVehiculos(params: any, id:string): Promise<any> {  
     const {poliza, tipoPoliza, vehiculos } = params
 
+    const vehiculosError= new Array();
+    let mensaje = 'Vehículos agregados con éxito'
+
     for await (const vehiculo of vehiculos) {
-      const existe = await TblVehiculos.query().where({'veh_placa':vehiculo.placa, 'veh_poliza': poliza, 'veh_tipo_poliza':tipoPoliza, 'veh_vigilado_id': id}).first()
+    let polizaActiva = false;
+      const vehiculosExiste = await TblVehiculos.query()
+      .where({'veh_placa': vehiculo.placa, 'veh_vigilado_id':id, 'veh_vinculada':true})
+      .preload('polizas')
+      .has('polizas')
+
+      vehiculosExiste.forEach(veh => {
+        const fechaActual = new Date(); 
+        const fecha = new Date(veh.polizas.finVigencia);   
+        const hoy = new Date(`${fechaActual.getFullYear()}-${fechaActual.getMonth()+1}-${fechaActual.getDate()}`) 
+        const fin = new Date(`${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}`)      
+            if (fin >= hoy) {
+              polizaActiva = true
+              vehiculosError.push({
+                error: `La placa ya se encuentra registrada en una póliza activa, póliza: ${veh.polizas.numero}` ,
+                valor: vehiculo.placa
+              });
+            }
+            
+          });
+
+       if (!polizaActiva) {
+        const existe = await TblVehiculos.query().preload('polizas')
+      .has('polizas')
+      .where({'veh_placa':vehiculo.placa, 'veh_poliza': poliza, 'veh_tipo_poliza':tipoPoliza, 'veh_vigilado_id': id}).first()
+
       if(!existe){
         const vehiculoNew = new TblVehiculos();
         vehiculoNew.poliza = poliza;
@@ -439,25 +467,29 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
         vehiculoNew.observacion = 'VINCULADA'
         await vehiculoNew.save()
 
-        const log = new TblLogVehiculos()
+      }else{
+        existe.pasajeros = vehiculo.pasajeros
+        existe.vinculada = true
+        await existe.save()
+        
+      }
+      const log = new TblLogVehiculos()
         log.tipoPoliza = tipoPoliza
         log.poliza = poliza
         log.placa = vehiculo.placa;
         log.vinculada = true
         log.vigiladoId = id
         log.observacion = 'VINCULADA'
-        await log.save()
-      }else{
-        existe.pasajeros = vehiculo.pasajeros
-        existe.vinculada = true
-        await existe.save()
-      }
-      
-  
+        await log.save() 
+       }else{
+        mensaje = 'Algunas placas ya están vinculadas en una póliza activa';
+       }
+    
+        
       
     }
     
-    return { mensaje: 'Vehiculos agregados con exito' }    
+    return { mensaje, vehiculosError }    
 
       
 
@@ -580,6 +612,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
      'po.pol_tipo_poliza_id as tipoPoliza'
    )
    .where('tv.veh_placa', placa)
+   .andWhere('po.pol_vigilado_id', id)
    .andWhere('po.pol_vigilado_id', id)
    .orderBy('veh_creado', 'desc')
 
