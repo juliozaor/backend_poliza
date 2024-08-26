@@ -444,7 +444,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
         const fin = new Date(`${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}`)      
             if (fin >= hoy) {
               polizaActiva = true
-              placasPolizas += `(placa: ${vehiculo.placa} -> póliza: ${veh.polizas.numero}) | `             
+              placasPolizas += `(placa: ${vehiculo.placa} -> póliza: ${veh.polizas.numero}) `             
             }
             
           });
