@@ -9,8 +9,7 @@ import { RespuestaImportacionExcel } from './Dtos/RespuestaImportacionExcel';
 import TblVehiculos from 'App/Infraestructura/Datos/Entidad/Vehiculos';
 import { Vehiculo } from '../Entidades/Vehiculo';
 import TblPolizas from 'App/Infraestructura/Datos/Entidad/poliza';
-import Errores from 'App/Exceptions/Errores';
-import Database from '@ioc:Adonis/Lucid/Database';
+import { TblLogVehiculos } from 'App/Infraestructura/Datos/Entidad/LogVehiculos';
 
 export class ServicioImportarVehiculos {
   async importDataXLSX(
@@ -23,7 +22,11 @@ export class ServicioImportarVehiculos {
     try {
 
 
-      const polizaDBExiste = await TblPolizas.findBy('pol_numero', poliza);
+     /*  const polizaDBExiste = await TblPolizas.findBy('pol_numero', poliza); */
+     const polizaDBExiste = await TblPolizas.query()
+      .where("pol_numero", poliza)
+      .andWhere("pol_tipo_poliza_id", tipo)
+      .first();
         
       if (polizaDBExiste) {      
         return new Resultado({
@@ -33,7 +36,8 @@ export class ServicioImportarVehiculos {
         });
       }
 
-
+      await TblVehiculos.query().where('veh_poliza',poliza).andWhere('veh_tipo_poliza',tipo).delete();      
+      await TblLogVehiculos.query().where('lov_poliza',poliza).andWhere('lov_tipo_poliza',tipo).delete();  
 
       const fname = `${new Date().getTime()}.${archivo.extname}`;
       const dir = 'uploads/';
@@ -56,7 +60,6 @@ export class ServicioImportarVehiculos {
       rutaArchivo = filePath;
 
       
-      // Resto de la lógica del servicio...
       let resultado = await this.importVehiculos(filePath, poliza, id, tipo)
       return resultado
     } catch (error) {
@@ -106,7 +109,7 @@ export class ServicioImportarVehiculos {
 
   async import(colComment: Excel.Column,hoja: Excel.Worksheet, poliza:number, id:string, tipoPoliza:number): Promise<Resultado<RespuestaImportacionExcel>> {
     
-    const errores = await this.validarVehiculos(hoja, poliza)
+    const errores = await this.validarVehiculos(hoja, poliza, id)
     
     if (errores.length > 0) {
       const archivoB64 = await this.generarCsvErrores(errores)
@@ -118,7 +121,6 @@ export class ServicioImportarVehiculos {
       })
     }
 
-    await TblVehiculos.query().where('veh_poliza',poliza).andWhere('veh_tipo_poliza',tipoPoliza).delete();
     
     colComment.eachCell(async (cell, rowNumber) => {
       if (rowNumber >= 2) {
@@ -134,9 +136,22 @@ export class ServicioImportarVehiculos {
             vigiladoId:id,
             tipoPoliza
           }
+
+          const inputlog = {
+            tipoPoliza,
+            poliza,
+            placa,
+            vinculada:true,
+            vigiladoId:id,
+            observacion:'CARGUE INICIAL'
+          }
+
+
+
           try {
            // await TblVehiculos.updateOrCreate({ placa: inputPlaca.placa }, inputPlaca)
             await TblVehiculos.create(inputPlaca)
+            await TblLogVehiculos.create(inputlog)
           } catch (error) {
             console.log(error);
             
@@ -153,7 +168,7 @@ export class ServicioImportarVehiculos {
   }
 
 
-  async validarVehiculos(hoja: Excel.Worksheet, poliza: number): Promise<ErrorFormatoImportarExcel[]> {
+  async validarVehiculos(hoja: Excel.Worksheet, poliza: number, id:string): Promise<ErrorFormatoImportarExcel[]> {
     let errores: ErrorFormatoImportarExcel[] = [];
   let seEncontroFilaValida = false;
 
@@ -183,6 +198,34 @@ export class ServicioImportarVehiculos {
         valor: placa
       });
     } else {
+
+      const vehiculos = await TblVehiculos.query()
+      .where({'veh_placa': placa, 'veh_vigilado_id':id})
+      .preload('polizas')
+      .has('polizas')
+
+      vehiculos.forEach(veh => {
+        const fechaActual = new Date(); 
+        const fecha = new Date(veh.polizas.finVigencia);   
+
+    const hoy = new Date(`${fechaActual.getFullYear()}-${fechaActual.getMonth()+1}-${fechaActual.getDate()}`) 
+    const fin = new Date(`${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}`)      
+        if (fin >= hoy) {
+          errores.push({
+            columna: 'A',
+            fila: i.toString(),
+            error: `La placa ya se encuentra registrada en una póliza activa, póliza: ${veh.polizas.numero}` ,
+            valor: placa
+          });
+        }
+        
+      });
+  
+
+
+
+
+
       //try {
         // Consultar si la placa existe en la tabla TblVehiculos
        
