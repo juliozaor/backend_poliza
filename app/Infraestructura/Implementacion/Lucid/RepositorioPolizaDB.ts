@@ -433,7 +433,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
     for await (const vehiculo of vehiculos) {
     let polizaActiva = false;
       const vehiculosExiste = await TblVehiculos.query()
-      .where({'veh_placa': vehiculo.placa, 'veh_vigilado_id':id, 'veh_vinculada':true})
+      .where({'veh_placa': vehiculo.placa, 'veh_vigilado_id':id, 'veh_vinculada':true, 'veh_tipo_poliza':tipoPoliza})
       .preload('polizas')
       .has('polizas')
 
