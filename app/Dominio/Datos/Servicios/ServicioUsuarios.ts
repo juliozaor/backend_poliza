@@ -45,11 +45,11 @@ export class ServicioUsuarios {
     usuario.claveTemporal = false
     usuario.usuario = usuario.identificacion.toString()
     const user = this.repositorio.guardarUsuario(usuario);
-    /* await this.enviadorEmail.enviarTemplate<Credenciales>({ 
+    this.enviadorEmail.enviarTemplate<Credenciales>({ 
       asunto: `Bienvenido(a) ${usuario.nombre}`, 
       destinatarios: usuario.correo,
     }, new EmailBienvenida({ clave: clave, nombre: usuario.nombre, usuario: usuario.usuario, logo: Env.get('LOGO') }))
-     */
+    
     return user
   }
 
@@ -68,6 +68,7 @@ export class ServicioUsuarios {
    
     usuario.id = uuidv4();
     usuario.usuario = usuario.identificacion.toString()
+    usuario.claveTemporal = false
     const user = this.repositorio.guardarUsuario(usuario); 
     return user
   }
