@@ -3,6 +3,7 @@ export interface RepositorioPoliza {
   guardar(datos:any, vigiladoId: string): Promise<any>
   capacidad(datos:any, vigiladoId: string): Promise<any>
   obtenerVehiculos(params: any, id:string): Promise<any>
+  buscarPorVigiladoId(vigiladoId: string): Promise<any>;
 
   listarPolizas(datos:any, vigiladoId: string): Promise<any>
   listarVehiculos(datos:any, vigiladoId: string): Promise<any>
@@ -12,7 +13,9 @@ export interface RepositorioPoliza {
   novedadesPoliza(datos:any): Promise<any>
   gestionarPlaca(placa:string, vigiladoId: string): Promise<any>
   desvincularPlaca(id:number, motivo: string): Promise<any>
-
+  
+    buscarPorVigiladoId(usn_id: string): Promise<any>;
+  
 }
 
 

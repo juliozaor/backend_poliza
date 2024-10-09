@@ -1,55 +1,62 @@
 /* eslint-disable @typescript-eslint/explicit-member-accessibility */
 import { RepositorioPoliza } from 'App/Dominio/Repositorios/RepositorioPoliza'
+import {Poliza}  from 'App/Dominio/Datos/Entidades/Poliza';
+import Database from '@ioc:Adonis/Lucid/Database';
 
-export class ServicioPoliza{
-  constructor (private repositorio: RepositorioPoliza) { }
 
-  async visualizar (datos:any, vigiladoId:string): Promise<any>{
-    return this.repositorio.visualizar(datos, vigiladoId)
+export class ServicioPoliza {
+  constructor(private repositorio: RepositorioPoliza) { }
+
+  public async obtenerPolizasPorUsuario(usn_id: string) {
+    return await this.repositorio.buscarPorVigiladoId(usn_id);
   }
 
-  async guardar (datos:any, vigiladoId: string): Promise<any>{
-    return this.repositorio.guardar(datos, vigiladoId)
+
+  async visualizar(datos: any, vigiladoId: string): Promise<any> {
+    return this.repositorio.visualizar(datos, vigiladoId);
   }
 
-  async capacidad (datos:any, vigiladoId: string): Promise<any>{
-    return this.repositorio.capacidad(datos, vigiladoId)
+  async guardar(datos: any, vigiladoId: string): Promise<any> {
+    return this.repositorio.guardar(datos, vigiladoId);
   }
 
-  async obtenerVehiculos (params: any, id:string): Promise<any>{
-    return this.repositorio.obtenerVehiculos(params, id)
+  async capacidad(datos: any, vigiladoId: string): Promise<any> {
+    return this.repositorio.capacidad(datos, vigiladoId);
   }
 
-  async listarPolizas (datos:any, vigiladoId: string): Promise<any>{
-    return this.repositorio.listarPolizas(datos, vigiladoId)
+  async obtenerVehiculos(params: any, id: string): Promise<any> {
+    return this.repositorio.obtenerVehiculos(params, id);
   }
 
-  async listarVehiculos (datos:any, vigiladoId: string): Promise<any>{
-    return this.repositorio.listarVehiculos(datos, vigiladoId)
+  async listarPolizas(datos: any, vigiladoId: string): Promise<any> {
+    return this.repositorio.listarPolizas(datos, vigiladoId);
   }
 
-  async eliminarVehiculos (datos:any, vigiladoId: string): Promise<any>{
-    return this.repositorio.eliminarVehiculos(datos, vigiladoId)
+  async listarVehiculos(datos: any, vigiladoId: string): Promise<any> {
+    return this.repositorio.listarVehiculos(datos, vigiladoId);
   }
 
-  async agregarVehiculos (datos:any, vigiladoId: string): Promise<any>{
-    return this.repositorio.agregarVehiculos(datos, vigiladoId)
+  async eliminarVehiculos(datos: any, vigiladoId: string): Promise<any> {
+    return this.repositorio.eliminarVehiculos(datos, vigiladoId);
   }
 
-  async interoperabilidad (datos:any, nit: string, id: string): Promise<any>{
-    return this.repositorio.interoperabilidad(datos, nit, id)
+  async agregarVehiculos(datos: any, vigiladoId: string): Promise<any> {
+    return this.repositorio.agregarVehiculos(datos, vigiladoId);
   }
 
-  async novedadesPoliza (datos:any): Promise<any>{
-    return this.repositorio.novedadesPoliza(datos)
+  async interoperabilidad(datos: any, nit: string, id: string): Promise<any> {
+    return this.repositorio.interoperabilidad(datos, nit, id);
   }
 
-  async gestionarPlaca (placa:string, vigiladoId: string): Promise<any>{
-    return this.repositorio.gestionarPlaca(placa, vigiladoId)
+  async novedadesPoliza(datos: any): Promise<any> {
+    return this.repositorio.novedadesPoliza(datos);
   }
 
-  async desvincularPlaca (id:number, motivo: string): Promise<any>{
-    return this.repositorio.desvincularPlaca(id, motivo)
+  async gestionarPlaca(placa: string, vigiladoId: string): Promise<any> {
+    return this.repositorio.gestionarPlaca(placa, vigiladoId);
   }
 
+  async desvincularPlaca(id: number, motivo: string): Promise<any> {
+    return this.repositorio.desvincularPlaca(id, motivo);
+  }
 }

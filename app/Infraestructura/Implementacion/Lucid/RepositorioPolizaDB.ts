@@ -13,9 +13,22 @@ import Errores from "App/Exceptions/Errores";
 import { ServicioEstados } from "App/Dominio/Datos/Servicios/ServicioEstados";
 import TblVehiculos from "App/Infraestructura/Datos/Entidad/Vehiculos";
 import { TblLogVehiculos } from "App/Infraestructura/Datos/Entidad/LogVehiculos";
+import {Poliza}  from 'App/Dominio/Datos/Entidades/Poliza';
+
 
 export class RepositorioPolizaDB implements RepositorioPoliza {
   private servicioEstados = new ServicioEstados();
+
+  
+  public async buscarPorVigiladoId(usn_id: string): Promise<any> {
+    const polizas = await Database
+      .from('tbl_polizas')
+      .where('pol_vigilado_id', usn_id)
+      .select('*');
+
+    return polizas;
+  }
+
 
   async visualizar(params: any, vigiladoId: string): Promise<any> {
     const { poliza, tipoPoliza } = params;
@@ -231,6 +244,8 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
       );
     }
   }
+
+  
 
   async obtenerVehiculos(params: any, id: string): Promise<any> {
     const { pagina, limite, vigiladoId, termino } = params;
