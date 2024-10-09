@@ -19,8 +19,7 @@ import {Poliza}  from 'App/Dominio/Datos/Entidades/Poliza';
 export class RepositorioPolizaDB implements RepositorioPoliza {
   private servicioEstados = new ServicioEstados();
 
-  // Método para buscar póliza por el ID del vigilado
-  // Implementación del método que estaba faltando
+  
   public async buscarPorVigiladoId(usn_id: string): Promise<any> {
     const polizas = await Database
       .from('tbl_polizas')
