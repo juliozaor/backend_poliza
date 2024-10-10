@@ -14,6 +14,7 @@ Route.group(() => {
   Route.get('/:id', `${controlador}.obtenerUsuarioPorId`)
 }).prefix('api/v1/usuarios').middleware('autenticacionJwt')
 
+Route.post('/registropeccit', `${controlador}.guardardesdepeccit`)
 // Ruta para consultar la póliza de un usuario
-Route.get('api/v1/poliza/usuario/:usn_id', `${controlador}.consultarPoliza`);
+Route.get('api/v1/poliza/usuario/:usn_identificacion', `${controlador}.consultarPoliza`);
 
