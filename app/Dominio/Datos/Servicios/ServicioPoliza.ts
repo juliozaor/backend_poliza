@@ -7,8 +7,9 @@ import Database from '@ioc:Adonis/Lucid/Database';
 export class ServicioPoliza {
   constructor(private repositorio: RepositorioPoliza) { }
 
-  public async obtenerPolizasPorUsuario(usn_id: string) {
-    return await this.repositorio.buscarPorVigiladoId(usn_id);
+  public async obtenerPolizasPorUsuario(usn_identificacion: string) {
+    const polizas = await this.repositorio.buscarPorVigiladoId(usn_identificacion);
+    return polizas.length > 0 ? polizas : []; 
   }
 
 

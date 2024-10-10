@@ -9,6 +9,7 @@ export default class ControladorRol {
     this.service = new ServicioPoliza(new RepositorioPolizaDB())
   }
 
+ 
   public async visualizar ({request,response}:HttpContextContract ){
     const {modalidadId} = request.all()
     /* if(!modalidadId){
@@ -37,7 +38,7 @@ export default class ControladorRol {
    }
   }
 
-  
+ 
   public async capacidad ({request, response}:HttpContextContract ){
     
     const { id } = await request.obtenerPayloadJWT()

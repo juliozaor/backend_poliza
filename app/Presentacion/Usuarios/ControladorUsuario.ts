@@ -34,14 +34,14 @@ export default class ControladorUsuario {
 
  public async consultarPoliza({ params, response }: HttpContextContract) {
   try {
-    const usn_id = params.usn_id; 
+    const usn_identificacion = params.usn_identificacion; 
 
-    if (!usn_id) {
+    if (!usn_identificacion) {
       return response.badRequest({ message: 'El ID del usuario es requerido.' });
     }
 
     
-    const polizas = await this.servicioPoliza.obtenerPolizasPorUsuario(usn_id);
+    const polizas = await this.servicioPoliza.obtenerPolizasPorUsuario(usn_identificacion);
 
     if (!polizas || polizas.length === 0) {
       
@@ -88,6 +88,13 @@ export default class ControladorUsuario {
     const dataUsuario = request.all()
     const payload = await request.obtenerPayloadJWT()
     const usuario = await this.service.guardarUsuario(dataUsuario, payload)
+    return usuario
+  }
+
+  public async guardardesdepeccit ({ request }) {
+    const dataUsuario = request.all()
+    //const payload = await request.obtenerPayloadJWT()
+    const usuario = await this.service.guardarUsuariodesdepeccit(dataUsuario)
     return usuario
   }
 

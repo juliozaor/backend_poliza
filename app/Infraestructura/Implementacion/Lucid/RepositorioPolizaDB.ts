@@ -20,13 +20,14 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
   private servicioEstados = new ServicioEstados();
 
   
-  public async buscarPorVigiladoId(usn_id: string): Promise<any> {
+  public async buscarPorVigiladoId(usn_identificacion: string) {
     const polizas = await Database
       .from('tbl_polizas')
-      .where('pol_vigilado_id', usn_id)
-      .select('*');
-
-    return polizas;
+      .innerJoin('tbl_usuarios', 'tbl_polizas.pol_vigilado_id', 'tbl_usuarios.usn_id') 
+      .where('tbl_usuarios.usn_identificacion', usn_identificacion) 
+      .select('tbl_polizas.*'); 
+  
+    return polizas; 
   }
 
 
