@@ -12,6 +12,17 @@ export class ServicioPoliza {
     return polizas.length > 0 ? polizas : []; 
   }
 
+  public async filtrarPolizas(
+    usn_identificacion: string,
+    pol_numero?: string,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<any> {
+    return this.repositorio.listarPolizasporNumero(usn_identificacion, pol_numero, page, limit);
+  }
+
+  
+
 
   async visualizar(datos: any, vigiladoId: string): Promise<any> {
     return this.repositorio.visualizar(datos, vigiladoId);
