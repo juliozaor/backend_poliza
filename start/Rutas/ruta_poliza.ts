@@ -22,4 +22,4 @@ Route.group(() => {
 
 }).prefix('api/v1/poliza').middleware('autenticacionJwt')
 
-Route.post('api/v1/poliza/guardardesdepeccit', accion_path + '.guardardesdepeccit')
+Route.get('/filtrarPolizas', accion_path +'.filtrarPolizas');

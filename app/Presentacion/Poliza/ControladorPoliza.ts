@@ -10,6 +10,33 @@ export default class ControladorRol {
   }
 
  
+  public async filtrarPolizas({ request, response }: HttpContextContract) {
+    const usn_identificacion = request.input('usn_identificacion');
+    const pol_numero = request.input('pol_numero');
+    const page = request.input('page', 1);
+    const limit = request.input('limit', 10);
+
+    if (!usn_identificacion) {
+      return response.status(400).json({ message: 'El campo usn_identificacion es requerido.' });
+    }
+
+    try {
+      const polizas = await this.service.filtrarPolizas(
+        usn_identificacion,
+        pol_numero,
+        Number(page),
+        Number(limit)
+      );
+      return response.json(polizas);
+    } catch (error) {
+      return response.status(500).json({ message: 'Error al filtrar pólizas', error: error.message });
+    }
+  }
+
+
+
+
+
   public async visualizar ({request,response}:HttpContextContract ){
     const {modalidadId} = request.all()
     /* if(!modalidadId){

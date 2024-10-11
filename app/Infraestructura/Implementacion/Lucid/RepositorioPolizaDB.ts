@@ -31,6 +31,58 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
   }
 
 
+  public async listarPolizasporNumero(
+    usn_identificacion: string,
+    pol_numero?: string,
+    page: number = 1,
+    limit: number = 10
+): Promise<any> {
+    const offset = (page - 1) * limit;
+
+    // Construcción de la consulta para contar el total
+    const countQuery = Database.from('tbl_polizas')
+        .innerJoin('tbl_usuarios', 'tbl_polizas.pol_vigilado_id', 'tbl_usuarios.usn_id')
+        .where('tbl_usuarios.usn_identificacion', usn_identificacion);
+
+    // Filtrar por número de póliza si se proporciona
+    if (pol_numero) {
+        countQuery.where('tbl_polizas.pol_numero', pol_numero);
+    }
+
+    // Obtener el total de pólizas
+    const totalPolizasResult = await countQuery.count('* as total');
+    const totalPolizas = totalPolizasResult[0].total; // Obtener el total de la respuesta
+
+    // Construcción de la consulta para obtener las pólizas paginadas
+    const polizasQuery = Database.from('tbl_polizas')
+        .innerJoin('tbl_usuarios', 'tbl_polizas.pol_vigilado_id', 'tbl_usuarios.usn_id')
+        .where('tbl_usuarios.usn_identificacion', usn_identificacion);
+
+    // Filtrar por número de póliza si se proporciona
+    if (pol_numero) {
+        polizasQuery.where('tbl_polizas.pol_numero', pol_numero);
+    }
+
+    // Obtener las pólizas paginadas
+    const polizas = await polizasQuery
+        .select('tbl_polizas.*')
+        .limit(limit)
+        .offset(offset);
+
+    // Calcular el total de páginas
+    const totalPages = Math.ceil(totalPolizas / limit);
+
+    // Retornar la respuesta
+    return {
+        total: totalPolizas,
+        totalPages: totalPages,
+        page: page,
+        limit: limit,
+        data: polizas,
+    };
+}
+
+
   async visualizar(params: any, vigiladoId: string): Promise<any> {
     const { poliza, tipoPoliza } = params;
     let polizaR: any;

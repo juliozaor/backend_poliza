@@ -14,6 +14,12 @@ export interface RepositorioPoliza {
   gestionarPlaca(placa:string, vigiladoId: string): Promise<any>
   desvincularPlaca(id:number, motivo: string): Promise<any>
   buscarPorVigiladoId(usn_identificacion: string): Promise<any>;
-  
+  listarPolizasporNumero(
+    usn_identificacion: string,
+    pol_numero?: string,
+    page?: number,
+    limit?: number
+  ): Promise<any>;
 }
+
 
