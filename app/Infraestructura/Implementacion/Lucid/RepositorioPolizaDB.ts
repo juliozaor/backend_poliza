@@ -14,6 +14,7 @@ import { ServicioEstados } from "App/Dominio/Datos/Servicios/ServicioEstados";
 import TblVehiculos from "App/Infraestructura/Datos/Entidad/Vehiculos";
 import { TblLogVehiculos } from "App/Infraestructura/Datos/Entidad/LogVehiculos";
 import {Poliza}  from 'App/Dominio/Datos/Entidades/Poliza';
+import TblPolizasModalidades from 'App/Dominio//Datos/Entidades/Polizas_Modalidades';
 
 
 export class RepositorioPolizaDB implements RepositorioPoliza {
@@ -137,30 +138,35 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
   }
 
   async guardar(datos: any, vigiladoId: string): Promise<any> {
-    const { polizaContractual, polizaExtracontractual } = datos;
-
+    const { polizaContractual, polizaExtracontractual, modalidadesPJson } = datos; // Asegúrate de extraer 'modalidadesPJson'
+  
     try {
-      await this.guardarPoliza(polizaContractual, vigiladoId, 1);
+      // Llamada a guardarPoliza con 4 argumentos
+      await this.guardarPoliza(polizaContractual, vigiladoId, 1, modalidadesPJson); 
+  
       if (polizaExtracontractual) {
-        await this.guardarPoliza(polizaExtracontractual, vigiladoId, 2);
+        // También asegúrate de pasar el cuarto argumento aquí
+        await this.guardarPoliza(polizaExtracontractual, vigiladoId, 2, modalidadesPJson); 
       }
+  
       this.servicioEstados.Log(vigiladoId, 3);
-      //Borrar las placas de este usuario que no tengan poliza
+  
+      // Borrar las placas de este usuario que no tengan poliza
       try {
-        await Database.rawQuery(
-          `DELETE FROM tbl_vehiculos 
-      WHERE veh_vigilado_id = '${vigiladoId}' 
-      AND veh_placa NOT IN (
-          SELECT v.veh_placa
-          FROM tbl_vehiculos v
-          LEFT JOIN tbl_polizas  p ON v.veh_poliza = p.pol_numero
-          WHERE p.pol_numero IS NOT null
-      )`
-        );
+        await Database.rawQuery(`
+          DELETE FROM tbl_vehiculos 
+          WHERE veh_vigilado_id = '${vigiladoId}' 
+          AND veh_placa NOT IN (
+            SELECT v.veh_placa
+            FROM tbl_vehiculos v
+            LEFT JOIN tbl_polizas  p ON v.veh_poliza = p.pol_numero
+            WHERE p.pol_numero IS NOT null
+          )
+        `);
       } catch (error) {
-        console.log("no se encontarron placas a eliminar");
+        console.log("No se encontraron placas a eliminar");
       }
-
+  
       return {
         mensaje: "Polizas guardada correctamente",
       };
@@ -168,58 +174,77 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
       throw error;
     }
   }
-
+  
+  // Modificación en la función guardarPoliza
   guardarPoliza = async (
     poliza: any,
     vigiladoId: string,
-    tipoPoliza: number
+    tipoPoliza: number,
+    modalidadesPJson: Array<{ id: string; nombre: string }> // Se requiere este argumento
   ) => {
-    //const polizaDBExiste = await TblPolizas.findBy('pol_numero', poliza.numero);
     const polizaDBExiste = await TblPolizas.query()
       .where("pol_numero", poliza.numero)
       .andWhere("pol_tipo_poliza_id", tipoPoliza)
       .first();
-
+  
     if (polizaDBExiste) {
-      throw new Errores(`La poliza'${poliza.numero}', ya existe`, 400);
+      throw new Errores(`La poliza '${poliza.numero}', ya existe`, 400);
     }
-
+  
     const tipo = tipoPoliza == 1 ? 2 : 1;
     const polizaExisteUsuario = await TblPolizas.query()
       .where("pol_numero", poliza.numero)
       .andWhere("pol_tipo_poliza_id", tipo)
       .andWhere("pol_vigilado_id", "<>", vigiladoId)
       .first();
+  
     if (polizaExisteUsuario) {
-      throw new Errores(`La poliza'${poliza.numero}', ya existe`, 400);
+      throw new Errores(`La poliza '${poliza.numero}', ya existe`, 400);
     }
-
+  
     const polizaDB = new TblPolizas();
     polizaDB.establecerPolizaDb(poliza);
     polizaDB.responsabilidad = poliza.tieneResponsabilidad ?? false;
     polizaDB.vigiladoId = vigiladoId;
     polizaDB.tipoPolizaId = tipoPoliza;
     await polizaDB.save();
-
+  
+   
+    if (modalidadesPJson && modalidadesPJson.length > 0) {
+      for (const modalidad of modalidadesPJson) {
+        
+        const modalidadIdNumerico = modalidad.id !== undefined && !isNaN(Number(modalidad.id)) 
+          ? Number(modalidad.id) 
+          : undefined;
+    
+        await TblPolizasModalidades.create({
+          pol_id: polizaDB.id, 
+          modpol_id: modalidadIdNumerico, 
+        });
+      }
+    }
+    
+  
     const amparosIn = new Array();
     poliza.amparos.forEach((amparo) => {
       amparo.poliza = poliza.numero;
       amparosIn.push(amparo);
     });
-
+  
     if (poliza.responsabilidad) {
       await this.guardarResponsabilidad(poliza.responsabilidad, poliza.numero);
     }
-
+  
     if (poliza.caratula) {
       await this.guardarArchivo(poliza.caratula, poliza.numero);
     }
-
+  
     try {
       await TblDetallesPolizaCoberturas.updateOrCreateMany(
         ["coberturaId", "poliza"],
         amparosIn
       );
+  
       return {
         mensaje: "Poliza guardada correctamente",
       };
@@ -227,6 +252,8 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
       console.log(error);
     }
   };
+  
+  
 
   guardarResponsabilidad = async (
     responsabilidad: Responsabilidad,
