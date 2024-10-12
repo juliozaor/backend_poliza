@@ -3,10 +3,26 @@ import ModalidadPoliza from 'App/Dominio/Datos/Entidades/ModalidadPoliza'
 
 export default class ModalidadPolizasController {
   // Listar todas las modalidades
-  public async index({ response }: HttpContextContract) {
-    const modalidades = await ModalidadPoliza.all()
-    return response.json(modalidades) // Enviando la lista de modalidades
+  // Listar todas las modalidades con alias
+public async index({ response }: HttpContextContract) {
+  const modalidades = await ModalidadPoliza
+    .query()
+    .select('modpol_id as id', 'modpol_nombre as nombre'); // Alias para los campos
+
+  // Transformar los resultados para extraer los valores de $extras, y cambiar el orden de los campos
+  const formattedModalidades = modalidades.map((modalidad) => {
+    return {
+      nombre: modalidad.$extras.nombre,
+      id: modalidad.$extras.id
+    };
+  });
+
+  if (formattedModalidades.length === 0) {
+    return response.status(404).json({ message: 'No se encontraron modalidades' });
   }
+
+  return response.json(formattedModalidades); // Enviar la lista formateada con nombre primero
+}
 
   // Crear una nueva modalidad
   public async store({ request, response }: HttpContextContract) {
