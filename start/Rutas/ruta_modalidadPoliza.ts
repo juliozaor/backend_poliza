@@ -11,4 +11,4 @@ Route.get('/modalidadpoliza/:id', `${controlador}.show`) // Obtener una modalida
 Route.put('/modalidadpoliza/:id', `${controlador}.update`) // Actualizar una modalidad
 Route.delete('/modalidadpoliza/:id', `${controlador}.destroy`) // Eliminar una modalidad
 
-}).prefix('api/v1/poliza').middleware('autenticacionJwt')
+}).prefix('api/v1/poliza').middleware('autenticacionJwt') 

@@ -2,7 +2,7 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import ModalidadPoliza from 'App/Dominio/Datos/Entidades/ModalidadPoliza'
 
 export default class ModalidadPolizasController {
-  // Listar todas las modalidades
+  
   // Listar todas las modalidades con alias
 public async index({ response }: HttpContextContract) {
   const modalidades = await ModalidadPoliza
