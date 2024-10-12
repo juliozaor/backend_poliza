@@ -22,4 +22,4 @@ Route.group(() => {
 
 }).prefix('api/v1/poliza').middleware('autenticacionJwt')
 
-Route.get('/filtrarPolizas', accion_path +'.filtrarPolizas');
+Route.get('api/v1/poliza/filtrarPolizas', accion_path +'.filtrarPolizas');
