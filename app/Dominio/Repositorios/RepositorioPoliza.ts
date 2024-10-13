@@ -21,6 +21,8 @@ export interface RepositorioPoliza {
     page?: number,
     limit?: number
   ): Promise<any>;
+
+  
 }
 
 

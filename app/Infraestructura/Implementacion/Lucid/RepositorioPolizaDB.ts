@@ -698,7 +698,22 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
 
   async novedadesPoliza(datos: any): Promise<any> {
     const { poliza, tipoPoliza } = datos;
-   const novedades = await TblLogVehiculos.query().where({'poliza':poliza,'tipoPoliza': tipoPoliza}).orderBy('creacion','desc')
+   const novedades = await TblLogVehiculos.query()
+   .innerJoin('tbl_tipos_polizas', 'tbl_tipos_polizas.tpo_id', 'tbl_log_vehiculos.lov_tipo_poliza')
+   .where({'poliza':poliza,'tipoPoliza': tipoPoliza})
+   .select(
+  'tbl_log_vehiculos.lov_tipo_poliza',
+  'tbl_log_vehiculos.lov_poliza',
+  'tbl_log_vehiculos.lov_placa',
+  'tbl_log_vehiculos.lov_vinculada',
+  'tbl_log_vehiculos.lov_observacion',
+  'tbl_log_vehiculos.lov_vigilado_id',
+  'tbl_tipos_polizas.tpo_descripcion'
+   )
+
+
+
+   .orderBy('creacion','desc')
    return novedades.map(n =>{
     return { 
       tipoPoliza: n.tipoPoliza, 
@@ -706,7 +721,8 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
       placa: n.placa,
       fechaActualizacion: n.creacion,
       estado:n.vinculada?'VINCULADA':'NO VINCULADA',
-      observacion: n.observacion
+      observacion: n.observacion,
+      tipopolizanombre:n.tpo_descripcion
      }
    })
 
