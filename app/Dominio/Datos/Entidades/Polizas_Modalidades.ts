@@ -1,19 +1,19 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
-
+import { BaseModel, column, HasOne, hasOne } from '@ioc:Adonis/Lucid/Orm'
+import ModalidadPoliza from './ModalidadPoliza';
 export default class TblPolizasModalidades extends BaseModel {
-  // Especificar el nombre correcto de la tabla
+  
   public static table = 'tbl_polizas_modalidades'
 
-  // Usar la columna correcta como clave primaria
+ 
   @column({ isPrimary: true })
   public id: number
 
-  // Clave foránea a la tabla tbl_polizas
+  
   @column()
   public pol_id: number
 
-  // Clave foránea a la tabla tbl_modalidadpolizas
+ 
   @column()
   public modpol_id: number
 
@@ -22,4 +22,10 @@ export default class TblPolizasModalidades extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
+
+  @hasOne(() => ModalidadPoliza, {
+    localKey: 'modpol_id',
+    foreignKey: 'modpol_id',
+  })
+  public obj_modalidad: HasOne<typeof ModalidadPoliza>
 }
