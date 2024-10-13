@@ -69,8 +69,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
         .preload('modalidades', (modalidadesQuery) => {
           modalidadesQuery.preload('obj_modalidad'); // Preload de la tabla tbl_modalidadpolizas
       })
-        .groupBy(
-            'tbl_polizas.pol_id',
+        .select( 'tbl_polizas.pol_id',
             'tbl_polizas.pol_numero',
             'tbl_polizas.pol_vigilado_id',
             'tbl_polizas.pol_aseguradora_id',
@@ -83,8 +82,22 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
             'tbl_polizas.pol_actualizado',
             'tbl_aseguradoras.ase_nombre',
             'tbl_tipos_polizas.tpo_nombre',
-            'tbl_tipos_polizas.tpo_descripcion'
-        );
+            'tbl_tipos_polizas.tpo_descripcion')
+
+        .groupBy( 'tbl_polizas.pol_id',
+            'tbl_polizas.pol_numero',
+            'tbl_polizas.pol_vigilado_id',
+            'tbl_polizas.pol_aseguradora_id',
+            'tbl_polizas.pol_tipo_poliza_id',
+            'tbl_polizas.pol_inicio_vigencia',
+            'tbl_polizas.pol_fin_vigencia',
+            'tbl_polizas.pol_responsabilidad',
+            'tbl_polizas.pol_estado',
+            'tbl_polizas.pol_creado',
+            'tbl_polizas.pol_actualizado',
+            'tbl_aseguradoras.ase_nombre',
+            'tbl_tipos_polizas.tpo_nombre',
+            'tbl_tipos_polizas.tpo_descripcion');;
 
     
     if (pol_numero) {
@@ -150,8 +163,6 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
         totalPolizasContractuales: totalPolizasContractuales[0].total_vehiculos 
     };
 }
-
-
 
   async visualizar(params: any, vigiladoId: string): Promise<any> {
     const { poliza, tipoPoliza } = params;
@@ -706,6 +717,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
    .where({'poliza':poliza,'tipoPoliza': tipoPoliza})
    .select(
   'tbl_log_vehiculos.lov_tipo_poliza',
+  'tbl_log_vehiculos.lov_creado',
   'tbl_log_vehiculos.lov_poliza',
   'tbl_log_vehiculos.lov_placa',
   'tbl_log_vehiculos.lov_vinculada',
