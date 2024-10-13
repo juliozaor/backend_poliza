@@ -6,6 +6,7 @@ export interface RepositorioPoliza {
   
 
   listarPolizas(datos:any, vigiladoId: string): Promise<any>
+  //listarPolizasPublica(datos:any): Promise<any>
   listarVehiculos(datos:any, vigiladoId: string): Promise<any>
   eliminarVehiculos(datos:any, vigiladoId: string): Promise<any>
   agregarVehiculos(datos:any, vigiladoId: string): Promise<any>

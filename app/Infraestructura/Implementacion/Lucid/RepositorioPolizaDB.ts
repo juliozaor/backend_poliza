@@ -20,6 +20,10 @@ import TblPolizasModalidades from 'App/Dominio//Datos/Entidades/Polizas_Modalida
 export class RepositorioPolizaDB implements RepositorioPoliza {
   private servicioEstados = new ServicioEstados();
 
+
+
+
+  
   
   public async buscarPorVigiladoId(usn_identificacion: string) {
     const polizas = await Database
@@ -40,48 +44,108 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
 ): Promise<any> {
     const offset = (page - 1) * limit;
 
-    // Construcción de la consulta para contar el total
     const countQuery = Database.from('tbl_polizas')
         .innerJoin('tbl_usuarios', 'tbl_polizas.pol_vigilado_id', 'tbl_usuarios.usn_id')
+        .innerJoin('tbl_aseguradoras', 'tbl_polizas.pol_aseguradora_id', 'tbl_aseguradoras.ase_id')
+        .innerJoin('tbl_tipos_polizas', 'tbl_polizas.pol_tipo_poliza_id', 'tbl_tipos_polizas.tpo_id')
         .where('tbl_usuarios.usn_identificacion', usn_identificacion);
 
-    // Filtrar por número de póliza si se proporciona
+
     if (pol_numero) {
         countQuery.where('tbl_polizas.pol_numero', pol_numero);
     }
 
-    // Obtener el total de pólizas
+    
     const totalPolizasResult = await countQuery.count('* as total');
-    const totalPolizas = totalPolizasResult[0].total; // Obtener el total de la respuesta
+    const totalPolizas = totalPolizasResult[0].total;
 
-    // Construcción de la consulta para obtener las pólizas paginadas
+    
     const polizasQuery = Database.from('tbl_polizas')
         .innerJoin('tbl_usuarios', 'tbl_polizas.pol_vigilado_id', 'tbl_usuarios.usn_id')
-        .where('tbl_usuarios.usn_identificacion', usn_identificacion);
+        .innerJoin('tbl_aseguradoras', 'tbl_polizas.pol_aseguradora_id', 'tbl_aseguradoras.ase_id')
+        .innerJoin('tbl_tipos_polizas', 'tbl_polizas.pol_tipo_poliza_id', 'tbl_tipos_polizas.tpo_id')
+        .leftJoin('tbl_vehiculos', 'tbl_polizas.pol_numero', 'tbl_vehiculos.veh_poliza') 
+        .where('tbl_usuarios.usn_identificacion', usn_identificacion)
+        .groupBy(
+            'tbl_polizas.pol_id',
+            'tbl_polizas.pol_numero',
+            'tbl_polizas.pol_vigilado_id',
+            'tbl_polizas.pol_aseguradora_id',
+            'tbl_polizas.pol_tipo_poliza_id',
+            'tbl_polizas.pol_inicio_vigencia',
+            'tbl_polizas.pol_fin_vigencia',
+            'tbl_polizas.pol_responsabilidad',
+            'tbl_polizas.pol_estado',
+            'tbl_polizas.pol_creado',
+            'tbl_polizas.pol_actualizado',
+            'tbl_aseguradoras.ase_nombre',
+            'tbl_tipos_polizas.tpo_nombre',
+            'tbl_tipos_polizas.tpo_descripcion'
+        );
 
-    // Filtrar por número de póliza si se proporciona
+    
     if (pol_numero) {
         polizasQuery.where('tbl_polizas.pol_numero', pol_numero);
     }
 
-    // Obtener las pólizas paginadas
+    
     const polizas = await polizasQuery
-        .select('tbl_polizas.*')
+        .select(
+            'tbl_polizas.*',
+            'tbl_aseguradoras.ase_nombre',
+            'tbl_tipos_polizas.tpo_nombre',
+            'tbl_tipos_polizas.tpo_descripcion',
+            Database.raw('COUNT(tbl_vehiculos.veh_id) as vehiculos_asociados') 
+        )
         .limit(limit)
         .offset(offset);
 
-    // Calcular el total de páginas
+
+    const totalVehiculosResult = await Database.from('tbl_vehiculos')
+        .innerJoin('tbl_polizas', 'tbl_vehiculos.veh_poliza', 'tbl_polizas.pol_numero')
+        .innerJoin('tbl_usuarios', 'tbl_polizas.pol_vigilado_id', 'tbl_usuarios.usn_id')
+        .where('tbl_usuarios.usn_identificacion', usn_identificacion)
+        .count('* as total_vehiculos');
+
+    const totalVehiculos = totalVehiculosResult[0].total_vehiculos;
+
+   
+    const totalPolizasActivas = await Database.from('tbl_polizas')
+        .innerJoin('tbl_usuarios', 'tbl_polizas.pol_vigilado_id', 'tbl_usuarios.usn_id') 
+        .where('tbl_polizas.pol_estado', true) 
+        .andWhere('tbl_usuarios.usn_identificacion', usn_identificacion)
+        .count('* as total_activas');
+
+    const totalPolizasExcontractuales = await Database.from('tbl_polizas')
+        .innerJoin('tbl_usuarios', 'tbl_polizas.pol_vigilado_id', 'tbl_usuarios.usn_id') 
+        .where('tbl_polizas.pol_estado', false) 
+        .andWhere('tbl_usuarios.usn_identificacion', usn_identificacion)
+        .count('* as total_excontractuales');
+
+    
+    const totalPolizasContractuales = await Database.from('tbl_polizas')
+        .innerJoin('tbl_usuarios', 'tbl_polizas.pol_vigilado_id', 'tbl_usuarios.usn_id')
+        .where('tbl_polizas.pol_estado', true) 
+        .andWhere('tbl_usuarios.usn_identificacion', usn_identificacion)
+        .count('* as total_contractuales');
+
+    
     const totalPages = Math.ceil(totalPolizas / limit);
 
-    // Retornar la respuesta
+    
     return {
         total: totalPolizas,
         totalPages: totalPages,
         page: page,
         limit: limit,
         data: polizas,
+        totalVehiculos: totalVehiculos, 
+        totalPolizasActivas: totalPolizasActivas[0].total_activas, 
+        totalPolizasExcontractuales: totalPolizasExcontractuales[0].total_excontractuales, 
+        totalPolizasContractuales: totalPolizasContractuales[0].total_contractuales 
     };
 }
+
 
 
   async visualizar(params: any, vigiladoId: string): Promise<any> {
