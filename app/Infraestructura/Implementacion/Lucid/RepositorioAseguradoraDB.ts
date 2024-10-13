@@ -7,14 +7,7 @@ import TblAseguradoras from 'App/Infraestructura/Datos/Entidad/Aseguradoras';
 export class RepositorioAseguradoraDB implements RepositorioAseguradora {
 
 
-  async obtenerAseguradoraPorPolizaId(polAseguradoraId: number): Promise<Aseguradora | null> {
-    const aseguradoraDB = await TblAseguradoras.find(polAseguradoraId);
   
-    if (aseguradoraDB) {
-      return new Aseguradora(aseguradoraDB);
-    }
-    return null;
-  }
 
 
   async obtenerAseguradoras(param: any): Promise<{aseguradoras: Aseguradora[], paginacion: Paginador}> {
