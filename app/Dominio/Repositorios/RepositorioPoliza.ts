@@ -12,6 +12,7 @@ export interface RepositorioPoliza {
   agregarVehiculos(datos:any, vigiladoId: string): Promise<any>
   interoperabilidad(datos:any, nit: string, id: string): Promise<any>
   novedadesPoliza(datos:any): Promise<any>
+  novedadesPolizapeccit(datos:any): Promise<any>
   gestionarPlaca(placa:string, vigiladoId: string): Promise<any>
   desvincularPlaca(id:number, motivo: string): Promise<any>
   buscarPorVigiladoId(usn_identificacion: string): Promise<any>;

@@ -181,6 +181,11 @@ export default class ControladorRol {
     return novedades
   }
 
+  public async novedadesPolizapeccit ({request,response}:HttpContextContract ){
+    const novedades = await this.service.novedadesPolizapeccit(request.all())
+    return novedades
+  }
+
   public async gestionarPlaca ({request, response}:HttpContextContract ){
     
     const { id } = await request.obtenerPayloadJWT()
