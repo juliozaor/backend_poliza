@@ -116,18 +116,20 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
         .andWhere('tbl_usuarios.usn_identificacion', usn_identificacion)
         .count('* as total_activas');
 
-    const totalPolizasExcontractuales = await Database.from('tbl_polizas')
-        .innerJoin('tbl_usuarios', 'tbl_polizas.pol_vigilado_id', 'tbl_usuarios.usn_id') 
-        .where('tbl_polizas.pol_estado', false) 
-        .andWhere('tbl_usuarios.usn_identificacion', usn_identificacion)
-        .count('* as total_excontractuales');
+    const totalPolizasExcontractuales = await Database.from('tbl_vehiculos')
+    .innerJoin('tbl_polizas', 'tbl_vehiculos.veh_poliza', 'tbl_polizas.pol_numero')
+    .innerJoin('tbl_usuarios', 'tbl_polizas.pol_vigilado_id', 'tbl_usuarios.usn_id')
+    .where('tbl_usuarios.usn_identificacion', usn_identificacion)
+    .where('tbl_polizas.pol_tipo_poliza_id', 2)
+    .count('* as total_vehiculos');
 
     
-    const totalPolizasContractuales = await Database.from('tbl_polizas')
-        .innerJoin('tbl_usuarios', 'tbl_polizas.pol_vigilado_id', 'tbl_usuarios.usn_id')
-        .where('tbl_polizas.pol_estado', true) 
-        .andWhere('tbl_usuarios.usn_identificacion', usn_identificacion)
-        .count('* as total_contractuales');
+    const totalPolizasContractuales = await Database.from('tbl_vehiculos')
+    .innerJoin('tbl_polizas', 'tbl_vehiculos.veh_poliza', 'tbl_polizas.pol_numero')
+    .innerJoin('tbl_usuarios', 'tbl_polizas.pol_vigilado_id', 'tbl_usuarios.usn_id')
+    .where('tbl_usuarios.usn_identificacion', usn_identificacion)
+    .where('tbl_polizas.pol_tipo_poliza_id', 1)
+    .count('* as total_vehiculos');
 
     
     const totalPages = Math.ceil(totalPolizas / limit);
@@ -141,8 +143,8 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
         data: polizas,
         totalVehiculos: totalVehiculos, 
         totalPolizasActivas: totalPolizasActivas[0].total_activas, 
-        totalPolizasExcontractuales: totalPolizasExcontractuales[0].total_excontractuales, 
-        totalPolizasContractuales: totalPolizasContractuales[0].total_contractuales 
+        totalPolizasExcontractuales: totalPolizasExcontractuales[0].total_vehiculos,
+        totalPolizasContractuales: totalPolizasContractuales[0].total_vehiculos 
     };
 }
 
