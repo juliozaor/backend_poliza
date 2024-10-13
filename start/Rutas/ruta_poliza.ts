@@ -22,6 +22,8 @@ Route.group(() => {
 
 }).prefix('api/v1/poliza').middleware('autenticacionJwt')
 
+
+Route.get('/novedades_polizapeccit', accion_path + '.novedadesPoliza')
 Route.get('/filtrarPolizas', accion_path +'.filtrarPolizas');
 Route.get('/detallepolizas/:pol_id', accion_path +'.listarPolizasPublica');
 //Route.get('/aseguradora/:polAseguradoraId', aseguradora_path + '.obtenerAseguradoraPorPolizaId');
