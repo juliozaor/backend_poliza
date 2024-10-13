@@ -70,6 +70,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
           modalidadesQuery.preload('obj_modalidad'); // Preload de la tabla tbl_modalidadpolizas
       })
         .select( 'tbl_polizas.pol_id',
+        
             'tbl_polizas.pol_numero',
             'tbl_polizas.pol_vigilado_id',
             'tbl_polizas.pol_aseguradora_id',
@@ -82,7 +83,9 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
             'tbl_polizas.pol_actualizado',
             'tbl_aseguradoras.ase_nombre',
             'tbl_tipos_polizas.tpo_nombre',
-            'tbl_tipos_polizas.tpo_descripcion')
+            'tbl_tipos_polizas.tpo_descripcion',
+            Database.raw('COUNT(tbl_vehiculos.veh_id) as vehiculos_asociados')
+          )
 
         .groupBy( 'tbl_polizas.pol_id',
             'tbl_polizas.pol_numero',
@@ -106,13 +109,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
 
     
     const polizas = await polizasQuery
-        .select(
-            'tbl_polizas.*',
-            'tbl_aseguradoras.ase_nombre',
-            'tbl_tipos_polizas.tpo_nombre',
-            'tbl_tipos_polizas.tpo_descripcion',
-            Database.raw('COUNT(tbl_vehiculos.veh_id) as vehiculos_asociados') 
-        )
+        
         .limit(limit)
         .offset(offset);
 
@@ -742,6 +739,31 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
    })
 
   }
+
+
+  async novedadesPolizapeccit(datos: any): Promise<any> {
+    const { poliza, tipoPoliza } = datos;
+   const array_novedades = await TblLogVehiculos.query()
+   .innerJoin('tbl_tipos_polizas', 'tbl_tipos_polizas.tpo_id', 'tbl_log_vehiculos.lov_tipo_poliza')
+   .where({'poliza':poliza,'tipoPoliza': tipoPoliza})
+   .select(
+    'tbl_log_vehiculos.lov_tipo_poliza',
+    'tbl_log_vehiculos.lov_creado',
+    'tbl_log_vehiculos.lov_poliza',
+    'tbl_log_vehiculos.lov_placa',
+    'tbl_log_vehiculos.lov_vinculada',
+    'tbl_log_vehiculos.lov_observacion',
+    'tbl_log_vehiculos.lov_vigilado_id',
+    'tbl_tipos_polizas.tpo_descripcion'
+   )
+   .orderBy('creacion','desc')
+   .paginate(datos.page, datos.numero_items)
+  
+
+   return array_novedades;
+
+  }
+
 
 
   generarPlaca() {

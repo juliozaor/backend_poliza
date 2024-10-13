@@ -23,7 +23,10 @@ export default class TblPolizas extends BaseModel {
   @column({ columnName: 'pol_estado' }) public estado?: boolean
   @column.dateTime({ autoCreate: true , columnName: 'pol_creado'}) public creado: DateTime
   @column.dateTime({ autoCreate: true, autoUpdate: true, columnName: 'pol_actualizado' }) public actualizado: DateTime
-
+  @column({ columnName: 'ase_nombre' }) public ase_nombre: string
+  @column({ columnName: 'tpo_nombre' }) public tpo_nombre: string
+  @column({ columnName: 'tpo_descripcion' }) public tpo_descripcion: string
+  @column({ columnName: 'vehiculos_asociados' }) public vehiculos_asociados: string
  
 
   public establecerPolizaDb (poliza: Poliza) {

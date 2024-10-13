@@ -79,6 +79,11 @@ export class ServicioPoliza {
   async novedadesPoliza(datos: any): Promise<any> {
     return this.repositorio.novedadesPoliza(datos);
   }
+  async novedadesPolizapeccit(datos: any): Promise<any> {
+    return this.repositorio.novedadesPolizapeccit(datos);
+  }
+
+  
 
   async gestionarPlaca(placa: string, vigiladoId: string): Promise<any> {
     return this.repositorio.gestionarPlaca(placa, vigiladoId);
