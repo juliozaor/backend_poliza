@@ -43,6 +43,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
     // Construcción de la consulta para contar el total
     const countQuery = Database.from('tbl_polizas')
         .innerJoin('tbl_usuarios', 'tbl_polizas.pol_vigilado_id', 'tbl_usuarios.usn_id')
+        .innerJoin('tbl_aseguradoras', 'tbl_polizas.pol_aseguradora_id', 'tbl_aseguradoras.ase_id') // Usar el nombre correcto de la tabla
         .where('tbl_usuarios.usn_identificacion', usn_identificacion);
 
     // Filtrar por número de póliza si se proporciona
@@ -57,6 +58,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
     // Construcción de la consulta para obtener las pólizas paginadas
     const polizasQuery = Database.from('tbl_polizas')
         .innerJoin('tbl_usuarios', 'tbl_polizas.pol_vigilado_id', 'tbl_usuarios.usn_id')
+        .innerJoin('tbl_aseguradoras', 'tbl_polizas.pol_aseguradora_id', 'tbl_aseguradoras.ase_id') // Usar el nombre correcto de la tabla
         .where('tbl_usuarios.usn_identificacion', usn_identificacion);
 
     // Filtrar por número de póliza si se proporciona
@@ -66,7 +68,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
 
     // Obtener las pólizas paginadas
     const polizas = await polizasQuery
-        .select('tbl_polizas.*')
+        .select('tbl_polizas.*', 'tbl_aseguradoras.ase_nombre') // Seleccionar el nombre de la aseguradora
         .limit(limit)
         .offset(offset);
 
@@ -82,6 +84,8 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
         data: polizas,
     };
 }
+
+
 
 
   async visualizar(params: any, vigiladoId: string): Promise<any> {

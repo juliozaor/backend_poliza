@@ -9,6 +9,28 @@ export default class ControladorAseguradora {
     this.service = new ServicioAseguradora(new RepositorioAseguradoraDB())
   }
 
+  public async obtenerAseguradoraPorPolizaId({ params, response }: HttpContextContract) {
+    const { polAseguradoraId } = params;
+
+    // Verifica que el ID es un número
+    const id = parseInt(polAseguradoraId, 10);
+    if (isNaN(id)) {
+        return response.status(400).json({ message: 'El ID de la aseguradora es inválido' });
+    }
+
+    try {
+        const aseguradora = await this.service.obtenerAseguradoraPorPolizaId(id);
+        if (aseguradora) {
+            return response.json(aseguradora);
+        }
+        return response.status(404).json({ message: 'Aseguradora no encontrada' });
+    } catch (error) {
+        return response.status(500).json({ message: error.message });
+    }
+}
+
+
+  
 
   public async obtenerAseguradoras ({response, request}:HttpContextContract){
       const aseguradoras = await this.service.obtenerAseguradoras(request.all())
