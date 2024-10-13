@@ -1,27 +1,27 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
 export default class extends BaseSchema {
-  protected tableName = 'tbl_polizas_modalidades'  // Cambiado el nombre de la tabla
+  protected tableName = 'tbl_polizas_modalidades'  
 
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('id') // ID único para la tabla
+      table.increments('id') 
 
-      // Clave foránea a 'tbl_polizas', con restricción de eliminación
+      
       table.integer('pol_id')
         .unsigned()
         .references('pol_id')
         .inTable('tbl_polizas')
-        .onDelete('RESTRICT')  // Evita eliminar si hay relaciones
+        .onDelete('RESTRICT')  
       
-      // Clave foránea a 'tbl_modalidadpolizas', con restricción de eliminación
+      
       table.integer('modpol_id')
         .unsigned()
         .references('modpol_id')
         .inTable('tbl_modalidadpolizas')
-        .onDelete('RESTRICT')  // Evita eliminar si hay relaciones
+        .onDelete('RESTRICT')  
       
-      // Timestamps para auditoría
+      
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
     })

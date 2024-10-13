@@ -8,6 +8,8 @@ import TblTiposPolizas from './TiposPoliza';
 import TblUsuarios from './Usuario';
 import TblDetallesPolizaCoberturas from './DetallespolizaCobertura';
 import TblArchivo from './Archivos';
+import  TblPolizasModalidades  from 'App/Dominio/Datos/Entidades/Polizas_Modalidades';
+
 
 export default class TblPolizas extends BaseModel {
   @column({ isPrimary: true, columnName: 'pol_id' })  public id?: number  
@@ -104,5 +106,11 @@ export default class TblPolizas extends BaseModel {
     foreignKey: 'poliza'
   })
   public archivo: HasMany<typeof TblArchivo>
+
+  @hasMany(()=>TblPolizasModalidades, {
+    localKey: 'id',
+    foreignKey: 'pol_id'
+  })
+  public modalidades: HasMany<typeof TblPolizasModalidades>
 
 }

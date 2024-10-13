@@ -60,12 +60,15 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
     const totalPolizas = totalPolizasResult[0].total;
 
     
-    const polizasQuery = Database.from('tbl_polizas')
+    const polizasQuery = TblPolizas.query()
         .innerJoin('tbl_usuarios', 'tbl_polizas.pol_vigilado_id', 'tbl_usuarios.usn_id')
         .innerJoin('tbl_aseguradoras', 'tbl_polizas.pol_aseguradora_id', 'tbl_aseguradoras.ase_id')
         .innerJoin('tbl_tipos_polizas', 'tbl_polizas.pol_tipo_poliza_id', 'tbl_tipos_polizas.tpo_id')
         .leftJoin('tbl_vehiculos', 'tbl_polizas.pol_numero', 'tbl_vehiculos.veh_poliza') 
         .where('tbl_usuarios.usn_identificacion', usn_identificacion)
+        .preload('modalidades', (modalidadesQuery) => {
+          modalidadesQuery.preload('obj_modalidad'); // Preload de la tabla tbl_modalidadpolizas
+      })
         .groupBy(
             'tbl_polizas.pol_id',
             'tbl_polizas.pol_numero',
