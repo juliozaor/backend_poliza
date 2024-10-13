@@ -89,7 +89,7 @@ export default class ControladorRol {
 
    public async listarPolizas ({request, response}:HttpContextContract ){
     
-    const { id } = await request.obtenerPayloadJWT()
+   const { id } = await request.obtenerPayloadJWT()
     try {     
      
       const polizas = await this.service.listarPolizas(request.all(), id)
@@ -101,6 +101,28 @@ export default class ControladorRol {
      
     }
    }
+
+   public async listarPolizasPublica({ params, response }: HttpContextContract) {
+    const pol_id = params.pol_id;  
+
+    try {
+      
+      const poliza = await this.service.obtenerDetallePoliza(pol_id);
+
+      if (!poliza) {
+        return response.status(404).json({ error: 'Póliza no encontrada.' });
+      }
+
+      return response.json(poliza);
+    } catch (error) {
+      
+      console.error('Error al obtener la póliza:', error);
+      return response.status(500).json({ error: 'Ocurrió un error al obtener el detalle de la póliza.', details: error.message });
+    }
+  }
+  
+
+   
 
    public async listarVehiculos ({request, response}:HttpContextContract ){
     

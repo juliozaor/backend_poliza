@@ -44,6 +44,22 @@ export class ServicioPoliza {
     return this.repositorio.listarPolizas(datos, vigiladoId);
   }
 
+
+  public async obtenerDetallePoliza(pol_id: number) {
+    try {
+     
+      const poliza = await Database
+        .from('tbl_polizas')  
+        .where('pol_id', pol_id)  
+        .first();  
+
+      return poliza; 
+    } catch (error) {
+      
+      throw new Error('Error al obtener la póliza: ' + error.message);
+    }
+  }
+
   async listarVehiculos(datos: any, vigiladoId: string): Promise<any> {
     return this.repositorio.listarVehiculos(datos, vigiladoId);
   }
