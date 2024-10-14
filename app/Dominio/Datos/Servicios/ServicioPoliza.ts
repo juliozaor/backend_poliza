@@ -96,5 +96,9 @@ export class ServicioPoliza {
     return this.repositorio.listarAmparo(datos);
   }
 
+  async consultarResponsabilidad(datos: any): Promise<any> {
+    return this.repositorio.consultarResponsabilidad(datos.poliza_id);
+  }
+  
   
 }

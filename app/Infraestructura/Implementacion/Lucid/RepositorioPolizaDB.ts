@@ -791,6 +791,17 @@ return array_amparos
 }
 
 
+async consultarResponsabilidad(poliza_id: string) {
+  let idNumerico = Number(poliza_id) // Convertir a BigInt
+  const obj_responsabilidad = await TblResponsabilidades
+    .query()
+    .where('res_poliza', idNumerico) // Usar BigInt para la comparación
+    .first() // O .fetch() si esperas varios resultados
+
+  return obj_responsabilidad
+}
+
+
 
   generarPlaca() {
     const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
