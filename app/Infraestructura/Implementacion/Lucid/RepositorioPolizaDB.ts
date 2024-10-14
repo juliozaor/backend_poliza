@@ -743,7 +743,7 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
 
   async novedadesPolizapeccit(datos: any): Promise<any> {
     const { poliza, tipoPoliza } = datos;
-   const array_novedades = await TblLogVehiculos.query()
+   const q =  TblLogVehiculos.query()
    .innerJoin('tbl_tipos_polizas', 'tbl_tipos_polizas.tpo_id', 'tbl_log_vehiculos.lov_tipo_poliza')
    .where({'poliza':poliza,'tipoPoliza': tipoPoliza})
    .select(
@@ -757,12 +757,38 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
     'tbl_tipos_polizas.tpo_descripcion'
    )
    .orderBy('creacion','desc')
-   .paginate(datos.page, datos.numero_items)
+
+   const array_novedades = await q.paginate(datos.page, datos.numero_items)
   
 
    return array_novedades;
 
   }
+
+
+  public async listarAmparo(query:any){
+    
+    
+    const q = TblDetallesPolizaCoberturas.query()
+    .innerJoin('tbl_coberturas', 'tbl_coberturas.cob_id', 'tbl_detalles_poliza_coberturas.dpl_cobertura_id')
+    .where( 'tbl_detalles_poliza_coberturas.dpl_poliza', query.poliza_id)
+        .select( 
+        'tbl_detalles_poliza_coberturas.dpl_id',
+        'tbl_detalles_poliza_coberturas.dpl_poliza',
+        'tbl_detalles_poliza_coberturas.dpl_cobertura_id',
+        'tbl_detalles_poliza_coberturas.dpl_valor_asegurado',
+        'tbl_detalles_poliza_coberturas.dpl_limite',
+        'tbl_detalles_poliza_coberturas.dpl_deducible',
+        'tbl_coberturas.cob_descripcion as cobertura_descricpion',
+        'tbl_coberturas.cob_nombre as cobertura_nombre',
+        'tbl_coberturas.tipo',
+      )
+    .orderBy('tbl_coberturas.tipo','asc')
+
+    const array_amparos = q.paginate(query.page, query.numero_items);
+   
+return array_amparos
+}
 
 
 

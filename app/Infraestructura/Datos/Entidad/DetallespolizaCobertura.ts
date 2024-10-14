@@ -10,6 +10,9 @@ export default class TblDetallesPolizaCoberturas extends BaseModel {
   @column({ columnName: 'dpl_deducible' }) public deducible: number
   @column({ columnName: 'dpl_poliza' }) public poliza: number
   @column({ columnName: 'dpl_cobertura_id' }) public coberturaId: number
+  @column({ columnName: 'cobertura_descricpion' }) public cobertura_descricpion: string
+  @column({ columnName: 'cobertura_nombre' }) public cobertura_nombre: string
+  @column({ columnName: 'tipo' }) public tipo: string
   
   
   @column.dateTime({ autoCreate: true , columnName: 'dpl_creado'}) public createdAt: DateTime

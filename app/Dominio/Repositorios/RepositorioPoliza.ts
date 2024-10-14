@@ -13,6 +13,7 @@ export interface RepositorioPoliza {
   interoperabilidad(datos:any, nit: string, id: string): Promise<any>
   novedadesPoliza(datos:any): Promise<any>
   novedadesPolizapeccit(datos:any): Promise<any>
+  listarAmparo(datos:any)
   gestionarPlaca(placa:string, vigiladoId: string): Promise<any>
   desvincularPlaca(id:number, motivo: string): Promise<any>
   buscarPorVigiladoId(usn_identificacion: string): Promise<any>;
