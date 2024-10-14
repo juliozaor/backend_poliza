@@ -217,6 +217,12 @@ export default class ControladorRol {
   
   }
 
+  public async consultarResponsabilidad ({request,response}:HttpContextContract ){
+    const amparos = await this.service.consultarResponsabilidad(request.all())
+    return amparos
+  
+  }
 
 
+  
 }

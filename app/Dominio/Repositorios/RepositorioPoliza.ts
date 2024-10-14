@@ -14,6 +14,7 @@ export interface RepositorioPoliza {
   novedadesPoliza(datos:any): Promise<any>
   novedadesPolizapeccit(datos:any): Promise<any>
   listarAmparo(datos:any)
+  consultarResponsabilidad(datos:any)
   gestionarPlaca(placa:string, vigiladoId: string): Promise<any>
   desvincularPlaca(id:number, motivo: string): Promise<any>
   buscarPorVigiladoId(usn_identificacion: string): Promise<any>;

@@ -26,5 +26,6 @@ Route.group(() => {
 Route.get('/novedades_polizapeccit', accion_path + '.novedadesPolizapeccit')
 Route.get('/filtrarPolizas', accion_path +'.filtrarPolizas');
 Route.get('/detallepolizas/:pol_id', accion_path +'.listarPolizasPublica');
-Route.get('/listaramparo', accion_path + '.listarAmparo')
+Route.get('/listaramparo', accion_path + '.listarAmparo');
+Route.get('/consultarresponsabilidad', accion_path + '.consultarResponsabilidad')
 
