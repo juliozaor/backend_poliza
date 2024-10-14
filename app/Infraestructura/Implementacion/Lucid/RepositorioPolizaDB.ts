@@ -792,14 +792,38 @@ return array_amparos
 
 
 async consultarResponsabilidad(poliza_id: string) {
-  let idNumerico = Number(poliza_id) // Convertir a BigInt
+  let idNumerico = Number(poliza_id);
   const obj_responsabilidad = await TblResponsabilidades
     .query()
-    .where('res_poliza', idNumerico) // Usar BigInt para la comparación
-    .first() // O .fetch() si esperas varios resultados
+    .innerJoin('tbl_polizas', 'tbl_responsabilidades.res_poliza', 'tbl_polizas.pol_numero')
+    .innerJoin('tbl_tipos_polizas', 'tbl_polizas.pol_tipo_poliza_id', 'tbl_tipos_polizas.tpo_id')
+    .select(
+     
+      'tbl_tipos_polizas.tpo_nombre as tipo_poliza_nombre',
+      'tbl_tipos_polizas.tpo_descripcion as tipo_poliza_descripcion',
+      'tbl_responsabilidades.res_id',
+      'tbl_responsabilidades.res_poliza',
+      'tbl_responsabilidades.res_fecha_constitucion',
+      'tbl_responsabilidades.res_resolucion',
+      'tbl_responsabilidades.res_fecha_resolucion',
+      'tbl_responsabilidades.res_valor_reserva',
+      'tbl_responsabilidades.res_fecha_reserva',
+      'tbl_responsabilidades.res_informacion',
+      'tbl_responsabilidades.res_operacion',
+      'tbl_responsabilidades.res_valor_cumplimiento_uno',
+      'tbl_responsabilidades.res_valor_cumplimiento_dos',
+      'tbl_responsabilidades.res_creado',
+      'tbl_responsabilidades.res_actualizado'
 
-  return obj_responsabilidad
+
+    )
+    .where('res_poliza', idNumerico)
+    .first();
+
+  return obj_responsabilidad;
 }
+
+
 
 
 
