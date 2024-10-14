@@ -211,5 +211,12 @@ export default class ControladorRol {
     return placas
   }
 
+  public async listarAmparo ({request,response}:HttpContextContract ){
+    const amparos = await this.service.listarAmparo(request.all())
+    return amparos
+  
+  }
+
+
 
 }

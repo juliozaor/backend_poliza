@@ -92,4 +92,9 @@ export class ServicioPoliza {
   async desvincularPlaca(id: number, motivo: string): Promise<any> {
     return this.repositorio.desvincularPlaca(id, motivo);
   }
+  async listarAmparo(datos: any): Promise<any> {
+    return this.repositorio.listarAmparo(datos);
+  }
+
+  
 }
