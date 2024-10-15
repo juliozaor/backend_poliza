@@ -14,8 +14,7 @@ export default class ModalidadPoliza extends BaseModel {
   @column()
   public modpol_nombre: string
 
-  @column()
-  public obj_modalidad: string
+  
 
   @column()
   public modpol_estado: boolean
