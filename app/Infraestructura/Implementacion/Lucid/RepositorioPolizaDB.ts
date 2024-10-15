@@ -378,6 +378,9 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
 
   async capacidad(datos: any, vigiladoId: string): Promise<any> {
     const { capacidades } = datos;
+
+    if(capacidades){
+      
     capacidades.map((capacidad) => {
       capacidad.vigiladoId = vigiladoId;
       return capacidad;
@@ -400,6 +403,8 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
         400
       );
     }
+  }
+
   }
 
   
