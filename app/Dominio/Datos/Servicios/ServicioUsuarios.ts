@@ -16,12 +16,15 @@ import { Credenciales } from "App/Dominio/Email/Modelos/Credenciales";
 import Env from '@ioc:Adonis/Core/Env';
 
 export class ServicioUsuarios {  
+  public clave: string;
   constructor(
     private repositorio: RepositorioUsuario,
     private generarContraseña: GeneradorContrasena,
     private encriptador: Encriptador,
     private enviadorEmail: EnviadorEmail
-    ) { }
+    ) { 
+      this.clave='';
+    }
 
   async obtenerUsuarios(params: any): Promise<{ usuarios: Usuario[], paginacion: Paginador }> {
     return this.repositorio.obtenerUsuarios(params);
@@ -54,19 +57,13 @@ export class ServicioUsuarios {
 
 
   async guardarUsuariodesdepeccit(usuario: Usuario): Promise<Usuario> {
-   /* if(payload.idRol !== '006' && payload.idRol !== '001'){
-      throw new Error("Usted no tiene autorización para crear usuarios");      
-    }*/
     const clave = await this.generarContraseña.generar()
     usuario.id = uuidv4();
     usuario.clave = await this.encriptador.encriptar(clave)
     usuario.usuario = usuario.identificacion.toString()
     const user = this.repositorio.guardarUsuario(usuario);
-    /*await this.enviadorEmail.enviarTemplate<Credenciales>({ 
-      asunto: `Bienvenido(a) ${usuario.nombre}`, 
-      destinatarios: usuario.correo,
-    }, new EmailBienvenida({ clave: clave, nombre: usuario.nombre, usuario: usuario.usuario, logo: Env.get('LOGO') }))
-    */
+    this.clave = clave;
+    
     return user
   }
 
