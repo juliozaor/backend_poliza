@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column, HasOne, hasOne } from '@ioc:Adonis/Lucid/Orm'
 import ModalidadPoliza from './ModalidadPoliza';
+
 export default class TblPolizasModalidades extends BaseModel {
   
   public static table = 'tbl_polizas_modalidades'
@@ -24,8 +25,12 @@ export default class TblPolizasModalidades extends BaseModel {
   public updatedAt: DateTime
 
   @hasOne(() => ModalidadPoliza, {
-    localKey: 'modpol_id',
-    foreignKey: 'modpol_id',
+    localKey: 'modpol_id',  // Campo de TblPolizasModalidades
+    foreignKey: 'modpol_id',  // Campo de ModalidadPoliza
   })
-  public obj_modalidad: HasOne<typeof ModalidadPoliza>
+  public obj_modalidad: HasOne<typeof ModalidadPoliza>;
+
+ 
+ 
+  
 }
