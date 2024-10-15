@@ -403,6 +403,10 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
         400
       );
     }
+  }else{
+    return {
+      mensaje: "Enviado",
+    };
   }
 
   }
