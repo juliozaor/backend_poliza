@@ -168,11 +168,17 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
       .preload("covertura")
       .preload("responsabilidades")
       .preload("archivo")
+      .preload('modalidades', (modalidadesQuery) => {
+        modalidadesQuery.preload('obj_modalidad'); // Preload de la tabla tbl_modalidadpolizas
+      })
       .where({ pol_numero: poliza, pol_tipo_poliza_id: tipoPoliza })
       .first();
 
     if (polizaDb) {
+      
+
       polizaR = {
+        modalidades:polizaDb.modalidades,
         numero: polizaDb.numero,
         aseguradoraId: polizaDb.aseguradoraId,
         inicioVigencia: polizaDb.inicioVigencia,

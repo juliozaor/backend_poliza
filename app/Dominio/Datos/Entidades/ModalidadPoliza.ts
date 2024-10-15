@@ -1,5 +1,7 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+//import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, column, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
+import TblPolizasModalidades from './Polizas_Modalidades'
 
 export default class ModalidadPoliza extends BaseModel {
   // Especificar el nombre correcto de la tabla
@@ -13,6 +15,9 @@ export default class ModalidadPoliza extends BaseModel {
   public modpol_nombre: string
 
   @column()
+  public obj_modalidad: string
+
+  @column()
   public modpol_estado: boolean
 
   @column.dateTime({ autoCreate: true })
@@ -20,4 +25,14 @@ export default class ModalidadPoliza extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
+
+  
+
+  @hasMany(() => TblPolizasModalidades, {
+    localKey: 'id',
+    foreignKey: 'modpol_id', 
+  })
+  public polizas: HasMany<typeof TblPolizasModalidades>
+
+   
 }
