@@ -215,20 +215,20 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
   }
 
   async guardar(datos: any, vigiladoId: string): Promise<any> {
-    const { polizaContractual, polizaExtracontractual, modalidadesPJson } = datos; // Asegúrate de extraer 'modalidadesPJson'
+    const { polizaContractual, polizaExtracontractual, modalidadesPJson } = datos; 
   
     try {
-      // Llamada a guardarPoliza con 4 argumentos
+      
       await this.guardarPoliza(polizaContractual, vigiladoId, 1, modalidadesPJson); 
   
       if (polizaExtracontractual) {
-        // También asegúrate de pasar el cuarto argumento aquí
+        
         await this.guardarPoliza(polizaExtracontractual, vigiladoId, 2, modalidadesPJson); 
       }
   
       this.servicioEstados.Log(vigiladoId, 3);
   
-      // Borrar las placas de este usuario que no tengan poliza
+      
       try {
         await Database.rawQuery(`
           DELETE FROM tbl_vehiculos 
@@ -252,12 +252,12 @@ export class RepositorioPolizaDB implements RepositorioPoliza {
     }
   }
   
-  // Modificación en la función guardarPoliza
+ 
   guardarPoliza = async (
     poliza: any,
     vigiladoId: string,
     tipoPoliza: number,
-    modalidadesPJson: Array<{ id: string; nombre: string }> // Se requiere este argumento
+    modalidadesPJson: Array<{ id: string; nombre: string }> 
   ) => {
     const polizaDBExiste = await TblPolizas.query()
       .where("pol_numero", poliza.numero)

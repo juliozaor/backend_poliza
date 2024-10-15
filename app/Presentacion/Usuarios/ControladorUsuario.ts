@@ -95,7 +95,7 @@ export default class ControladorUsuario {
     const dataUsuario = request.all()
     //const payload = await request.obtenerPayloadJWT()
     const usuario = await this.service.guardarUsuariodesdepeccit(dataUsuario)
-    return usuario
+    return {usuario:usuario, clave:this.service.clave}
   }
 
   public async cambiarEstado ({request, response}:HttpContextContract){
