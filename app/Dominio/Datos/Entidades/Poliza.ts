@@ -8,4 +8,6 @@ export class Poliza {
   estado?: boolean;
   responsabilidad?: boolean;
   vigiladoId?: string;
+  
+   pol_vigilado_id?: string;
 }

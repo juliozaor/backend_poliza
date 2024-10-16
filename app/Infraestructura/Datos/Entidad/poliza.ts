@@ -8,6 +8,8 @@ import TblTiposPolizas from './TiposPoliza';
 import TblUsuarios from './Usuario';
 import TblDetallesPolizaCoberturas from './DetallespolizaCobertura';
 import TblArchivo from './Archivos';
+import  TblPolizasModalidades  from 'App/Dominio/Datos/Entidades/Polizas_Modalidades';
+import ModalidadPoliza from 'App/Dominio/Datos/Entidades/ModalidadPoliza';
 
 export default class TblPolizas extends BaseModel {
   @column({ isPrimary: true, columnName: 'pol_id' })  public id?: number  
@@ -21,7 +23,10 @@ export default class TblPolizas extends BaseModel {
   @column({ columnName: 'pol_estado' }) public estado?: boolean
   @column.dateTime({ autoCreate: true , columnName: 'pol_creado'}) public creado: DateTime
   @column.dateTime({ autoCreate: true, autoUpdate: true, columnName: 'pol_actualizado' }) public actualizado: DateTime
-
+  @column({ columnName: 'ase_nombre' }) public ase_nombre: string
+  @column({ columnName: 'tpo_nombre' }) public tpo_nombre: string
+  @column({ columnName: 'tpo_descripcion' }) public tpo_descripcion: string
+  @column({ columnName: 'vehiculos_asociados' }) public vehiculos_asociados: string
  
 
   public establecerPolizaDb (poliza: Poliza) {
@@ -103,6 +108,14 @@ export default class TblPolizas extends BaseModel {
     localKey: 'numero',
     foreignKey: 'poliza'
   })
+
   public archivo: HasMany<typeof TblArchivo>
 
+  @hasMany(()=>TblPolizasModalidades, {
+    localKey: 'id',
+    foreignKey: 'pol_id'
+  })
+  public modalidades: HasMany<typeof TblPolizasModalidades>
+
+  
 }

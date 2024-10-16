@@ -8,4 +8,7 @@ export interface RepositorioAseguradora {
   crearAseguradora(aseguradora: Aseguradora): Promise<Aseguradora>
   actualizarAseguradoraAll(aseguradora:Aseguradora): Promise<Aseguradora>
   eliminarAseguradora(id:number): Promise<{message: string}>
-}
+  //obtenerAseguradoraPorPolizaId(polAseguradoraId: number): Promise<Aseguradora | null>;
+
+  }
+

@@ -17,6 +17,8 @@ export default class TblResponsabilidades extends BaseModel {
   @column({ columnName: 'res_valor_cumplimiento_uno' }) public valorCumplimientoUno: number
   @column({ columnName: 'res_valor_cumplimiento_dos' }) public valorCumplimientoDos: number
   @column.dateTime({ autoCreate: true , columnName: 'res_creado'}) public createdAt: DateTime
+  @column({ columnName: 'tipo_poliza_nombre' }) public tipo_poliza_nombre: string
+  @column({ columnName: 'tipo_poliza_descripcion' }) public tipo_poliza_descripcion: string
   @column.dateTime({ autoCreate: true, autoUpdate: true, columnName: 'res_actualizado' }) public updatedAt: DateTime 
 
   public establecerResponsabilidadDb (responsabilidad: Responsabilidad) {

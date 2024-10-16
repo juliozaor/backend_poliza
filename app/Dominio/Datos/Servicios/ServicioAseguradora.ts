@@ -20,5 +20,6 @@ export class ServicioAseguradora{
   async eliminarAseguradora(id:number): Promise<{message: string}>{
     return this.repositorio.eliminarAseguradora(id)
   }
-
+ 
+  
 }

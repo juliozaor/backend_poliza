@@ -13,7 +13,7 @@ export class TblLogVehiculos extends BaseModel {
   @column({ columnName: 'lov_vinculada' }) public vinculada: boolean;
   @column({ columnName: 'lov_observacion' }) public observacion: string;
   @column({ columnName: 'lov_vigilado_id' }) public vigiladoId: string;
-
+  @column({ columnName: 'tpo_descripcion' }) public tpo_descripcion: string;
   @column.dateTime({ autoCreate: true, columnName: 'lov_creado' })
   public creacion: DateTime
 

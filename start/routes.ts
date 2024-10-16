@@ -2,6 +2,8 @@ import Route from '@ioc:Adonis/Core/Route'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { extname } from 'path'
 import Drive from '@ioc:Adonis/Core/Drive'
+// Importar archivo de rutas para modalidad de polizas
+import './Rutas/ruta_modalidadPoliza'
 
 Route.get('/', async ({ response }: HttpContextContract) => {
   response.status(200).send('¡Bienvenido!')
