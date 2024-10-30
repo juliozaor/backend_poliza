@@ -9,6 +9,7 @@ export default class ControladorAseguradora {
     this.service = new ServicioAseguradora(new RepositorioAseguradoraDB())
   }
 
+  
 
   public async obtenerAseguradoras ({response, request}:HttpContextContract){
       const aseguradoras = await this.service.obtenerAseguradoras(request.all())

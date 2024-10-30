@@ -5,4 +5,7 @@ export class Aseguradora {
   direccion: string
   telefono: number
   estado: boolean
+
+  
+
 }

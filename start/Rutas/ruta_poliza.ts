@@ -1,7 +1,7 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 const accion_path = '../../../app/Presentacion/Poliza/ControladorPoliza'
-
+//const aseguradora_path = '../../../app/Presentacion/Aseguradora/ControladorAseguradora';
 Route.group(() => {
   Route.get('', accion_path + '.visualizar')
   Route.get('/vehiculos', accion_path + '.obtenerVehiculos')
@@ -21,3 +21,11 @@ Route.group(() => {
     Route.patch('/desvincular-placa', accion_path + '.desvincularPlaca')
 
 }).prefix('api/v1/poliza').middleware('autenticacionJwt')
+
+
+Route.get('/novedades_polizapeccit', accion_path + '.novedadesPolizapeccit')
+Route.get('/filtrarPolizas', accion_path +'.filtrarPolizas');
+Route.get('/detallepolizas/:pol_id', accion_path +'.listarPolizasPublica');
+Route.get('/listaramparo', accion_path + '.listarAmparo');
+Route.get('/consultarresponsabilidad', accion_path + '.consultarResponsabilidad')
+

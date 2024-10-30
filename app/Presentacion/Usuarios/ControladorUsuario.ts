@@ -6,22 +6,66 @@ import { GeneradorContrasena } from 'App/Dominio/GenerarContrasena/GenerarContra
 import { EncriptadorAdonis } from 'App/Infraestructura/Encriptacion/EncriptadorAdonis'
 import { RepositorioUsuariosDB } from '../../Infraestructura/Implementacion/Lucid/RepositorioUsuariosDB'
 import { EnviadorEmailAdonis } from 'App/Infraestructura/Email/EnviadorEmailAdonis'
+import { ServicioPoliza } from 'App/Dominio/Datos/Servicios/ServicioPoliza'
+import { RepositorioPolizaDB } from 'App/Infraestructura/Implementacion/Lucid/RepositorioPolizaDB'; 
+//import {ControladorUsuario} from 'App/presentacion/usuarios/ControladorUsuario';
+
 
 export default class ControladorUsuario {
   private service: ServicioUsuarios
+  private servicioPoliza: ServicioPoliza; 
   constructor () {
+    
     this.service = new ServicioUsuarios(
       new RepositorioUsuariosDB(), 
       new GeneradorContrasena(), 
       new EncriptadorAdonis(),
       new EnviadorEmailAdonis()
-    )
+    );
+    this.servicioPoliza = new ServicioPoliza(new RepositorioPolizaDB())
   }
 
   public async listar ({ request }:HttpContextContract) {
     const usuarios = await this.service.obtenerUsuarios(request.all())
     return usuarios
   }
+
+ 
+
+ public async consultarPoliza({ params, response }: HttpContextContract) {
+  try {
+    const usn_identificacion = params.usn_identificacion; 
+
+    if (!usn_identificacion) {
+      return response.badRequest({ message: 'El ID del usuario es requerido.' });
+    }
+
+    
+    const polizas = await this.servicioPoliza.obtenerPolizasPorUsuario(usn_identificacion);
+
+    if (!polizas || polizas.length === 0) {
+      
+      return response.ok({
+        message: 'Pólizas asociadas a la empresa',
+        status: 200,
+        polizas: []
+      });
+    }
+
+    
+    return response.ok({
+      message: 'Pólizas asociadas a la empresa',
+      status: 200,
+      polizas: polizas
+    });
+
+  } catch (error) {
+    console.error('Error al consultar pólizas:', error);
+    return response.internalServerError({ message: 'Error al consultar pólizas' });
+  }
+}
+
+
 
   public async obtenerUsuarioPorId ({ params }) {
     const usuario = await this.service.obtenerUsuarioPorId(params.id)
@@ -47,6 +91,13 @@ export default class ControladorUsuario {
     return usuario
   }
 
+  public async guardardesdepeccit ({ request }) {
+    const dataUsuario = request.all()
+    //const payload = await request.obtenerPayloadJWT()
+    const usuario = await this.service.guardarUsuariodesdepeccit(dataUsuario)
+    return {usuario:usuario, clave:this.service.clave}
+  }
+
   public async cambiarEstado ({request, response}:HttpContextContract){
     try{
       let id = request.param('id')
@@ -62,5 +113,4 @@ export default class ControladorUsuario {
     const usuario = await this.service.guardarUsuarioVigia(dataUsuario)
     return usuario
   }
-  
 }

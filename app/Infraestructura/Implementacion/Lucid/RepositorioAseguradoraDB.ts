@@ -6,6 +6,10 @@ import TblAseguradoras from 'App/Infraestructura/Datos/Entidad/Aseguradoras';
 
 export class RepositorioAseguradoraDB implements RepositorioAseguradora {
 
+
+  
+
+
   async obtenerAseguradoras(param: any): Promise<{aseguradoras: Aseguradora[], paginacion: Paginador}> {
     const aseguradoras: Aseguradora[] = [];
     const { pagina, limite, termino } = param;

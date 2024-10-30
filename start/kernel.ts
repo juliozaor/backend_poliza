@@ -41,6 +41,7 @@ Server.middleware.register([
 |
 */
 Server.middleware.registerNamed({
-  autenticacionJwt : () => import('App/Middlewares/AuntenticacionJWT'),
-  autenticacionVigia: () => import('App/Middlewares/AutenticacionVigia') 
+  autenticacionJwt : () => import('App/Middlewares/AuntenticacionJWT'), 
+  autenticacionVigia: () => import('App/Middlewares/AutenticacionVigia'),
+  verifyToken : () => import('App/Middlewares/VerifyToken') 
 })
