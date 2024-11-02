@@ -16,5 +16,6 @@ Route.group(() => {
 
 Route.post('/registropeccit', `${controlador}.guardardesdepeccit`)
 // Ruta para consultar la póliza de un usuario
-Route.get('api/v1/poliza/usuario/:usuario', `${controlador}.obtenerUsuarioPorUsuario`);
+Route.get('api/v1/poliza/usuario/:usn_identificacion', `${controlador}.consultarPoliza`);
+Route.get('api/v1/poliza/validar/:usuario', `${controlador}.obtenerUsuarioPorUsuario`);
 
