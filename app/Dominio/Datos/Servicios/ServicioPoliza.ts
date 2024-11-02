@@ -21,9 +21,6 @@ export class ServicioPoliza {
     return this.repositorio.listarPolizasporNumero(usn_identificacion, pol_numero, page, limit);
   }
 
-  
-
-
   async visualizar(datos: any, vigiladoId: string): Promise<any> {
     return this.repositorio.visualizar(datos, vigiladoId);
   }
@@ -43,7 +40,6 @@ export class ServicioPoliza {
   async listarPolizas(datos: any, vigiladoId: string): Promise<any> {
     return this.repositorio.listarPolizas(datos, vigiladoId);
   }
-
 
   public async obtenerDetallePoliza(pol_id: number) {
     try {
@@ -82,9 +78,7 @@ export class ServicioPoliza {
   async novedadesPolizapeccit(datos: any): Promise<any> {
     return this.repositorio.novedadesPolizapeccit(datos);
   }
-
   
-
   async gestionarPlaca(placa: string, vigiladoId: string): Promise<any> {
     return this.repositorio.gestionarPlaca(placa, vigiladoId);
   }

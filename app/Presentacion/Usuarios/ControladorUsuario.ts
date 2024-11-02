@@ -65,8 +65,6 @@ export default class ControladorUsuario {
   }
 }
 
-
-
   public async obtenerUsuarioPorId ({ params }) {
     const usuario = await this.service.obtenerUsuarioPorId(params.id)
     return usuario
