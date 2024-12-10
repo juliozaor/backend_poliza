@@ -28,4 +28,5 @@ Route.get('/filtrarPolizas', accion_path +'.filtrarPolizas');
 Route.get('/detallepolizas/:pol_id', accion_path +'.listarPolizasPublica');
 Route.get('/listaramparo', accion_path + '.listarAmparo');
 Route.get('/consultarresponsabilidad', accion_path + '.consultarResponsabilidad')
+Route.get('/consultar', accion_path + '.consultarPoliza').prefix('api/v1/poliza')
 
