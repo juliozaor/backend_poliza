@@ -2,6 +2,7 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { ServicioPoliza } from 'App/Dominio/Datos/Servicios/ServicioPoliza'
 import TblPolizas from 'App/Infraestructura/Datos/Entidad/poliza'
+import TblVehiculos from 'App/Infraestructura/Datos/Entidad/Vehiculos'
 import { RepositorioPolizaDB } from 'App/Infraestructura/Implementacion/Lucid/RepositorioPolizaDB'
 
 export default class ControladorRol {
@@ -225,23 +226,26 @@ export default class ControladorRol {
   }
 
   public async consultarPoliza ({request,response}:HttpContextContract ){
-    const { numero_poliza } = request.all()
-    if (!numero_poliza || numero_poliza == '') {
-      return response.status(400).send('El número de póliza es requerido')
+    const { placa } = request.all()
+    if (!placa || placa == '') {
+      return response.status(400).send('El número de placa es requerido')
     }
     try {
-      const poliza = await TblPolizas.query().preload('tipoPoliza').where('numero', numero_poliza)
-      if(poliza.length == 0){return response.status(404).send('La póliza no existe dentro del sistema')}
+      const poliza = await TblVehiculos.query().preload('polizas', sqlPolizas => sqlPolizas.preload('tipoPoliza')).where({'placa': placa, 'vinculada':true})
+         
+      if(poliza.length == 0){return response.status(404).send('La placa no existe dentro del sistema')}
       return poliza.map((dataPoliza) => {
         return {
-          poliza: dataPoliza.numero,
-          fechaInicio: dataPoliza.inicioVigencia,
-          fechaFin: dataPoliza.finVigencia,
-          tipo: dataPoliza.tipoPoliza.nombre,
-          descripcion: dataPoliza.tipoPoliza.descripcion
+          poliza: dataPoliza.polizas.numero,
+          fechaInicio: dataPoliza.polizas.inicioVigencia,
+          fechaFin: dataPoliza.polizas.finVigencia,
+          tipo: dataPoliza.polizas.tipoPoliza.nombre,
+          descripcion: dataPoliza.polizas.tipoPoliza.descripcion
         }
       })
     } catch (error) {
+      console.log(error);
+      
       return response.status(500).send('Se presento un error en la consulta, intente nuevamente.')
     }
 
