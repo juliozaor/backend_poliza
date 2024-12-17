@@ -232,7 +232,6 @@ export default class ControladorRol {
     }
     try {
       const poliza = await TblVehiculos.query().preload('polizas', sqlPolizas => sqlPolizas.preload('tipoPoliza')).where({'placa': placa, 'vinculada':true})
-         
       if(poliza.length == 0){return response.status(404).send('La placa no existe dentro del sistema')}
       return poliza.map((dataPoliza) => {
         return {
@@ -245,10 +244,14 @@ export default class ControladorRol {
       })
     } catch (error) {
       console.log(error);
-      
+
       return response.status(500).send('Se presento un error en la consulta, intente nuevamente.')
     }
+  }
 
+  public async actualizarPoliza({ request, response }: HttpContextContract) {
+    const polizaActualizada = await this.service.actualizarPoliza(request.all())
+    return polizaActualizada
   }
 
 

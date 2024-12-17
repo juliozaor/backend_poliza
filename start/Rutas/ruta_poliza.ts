@@ -20,6 +20,7 @@ Route.group(() => {
     Route.get('/gestionar-placa', accion_path + '.gestionarPlaca')
     Route.patch('/desvincular-placa', accion_path + '.desvincularPlaca')
 
+    Route.patch('/actualizar-poliza', accion_path + '.actualizarPoliza')
 }).prefix('api/v1/poliza').middleware('autenticacionJwt')
 
 
