@@ -3,7 +3,7 @@ export interface RepositorioPoliza {
   guardar(datos:any, vigiladoId: string): Promise<any>
   capacidad(datos:any, vigiladoId: string): Promise<any>
   obtenerVehiculos(params: any, id:string): Promise<any>
-  
+
 
   listarPolizas(datos:any, vigiladoId: string): Promise<any>
   //listarPolizasPublica(datos:any): Promise<any>
@@ -24,8 +24,9 @@ export interface RepositorioPoliza {
     page?: number,
     limit?: number
   ): Promise<any>;
+  actualizarPoliza(datos: any): Promise<any>;
 
-  
+
 }
 
 

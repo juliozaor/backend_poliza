@@ -9,7 +9,7 @@ export class ServicioPoliza {
 
   public async obtenerPolizasPorUsuario(usn_identificacion: string) {
     const polizas = await this.repositorio.buscarPorVigiladoId(usn_identificacion);
-    return polizas.length > 0 ? polizas : []; 
+    return polizas.length > 0 ? polizas : [];
   }
 
   public async filtrarPolizas(
@@ -43,15 +43,15 @@ export class ServicioPoliza {
 
   public async obtenerDetallePoliza(pol_id: number) {
     try {
-     
-      const poliza = await Database
-        .from('tbl_polizas')  
-        .where('pol_id', pol_id)  
-        .first();  
 
-      return poliza; 
+      const poliza = await Database
+        .from('tbl_polizas')
+        .where('pol_id', pol_id)
+        .first();
+
+      return poliza;
     } catch (error) {
-      
+
       throw new Error('Error al obtener la póliza: ' + error.message);
     }
   }
@@ -78,7 +78,7 @@ export class ServicioPoliza {
   async novedadesPolizapeccit(datos: any): Promise<any> {
     return this.repositorio.novedadesPolizapeccit(datos);
   }
-  
+
   async gestionarPlaca(placa: string, vigiladoId: string): Promise<any> {
     return this.repositorio.gestionarPlaca(placa, vigiladoId);
   }
@@ -93,6 +93,9 @@ export class ServicioPoliza {
   async consultarResponsabilidad(datos: any): Promise<any> {
     return this.repositorio.consultarResponsabilidad(datos.poliza_id);
   }
-  
-  
+
+  async actualizarPoliza(datos: any): Promise<any> {
+    return this.repositorio.actualizarPoliza(datos);
+  }
+
 }
